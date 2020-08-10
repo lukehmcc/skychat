@@ -26,9 +26,13 @@
                     user = `<i>Anonomous</i>`
                 }
                 var epoch = comment.getElementsByTagName("epoch")[0].innerHTML;
-                var contactMd5 = CryptoJS.MD5(comment.getElementsByTagName("contact")[0].innerHTML);
+                var contact = comment.getElementsByTagName("contact")[0].innerHTML;
+                var contactImg = "";
+                if (contact.length == 46) {
+                   contactImg = `https://${skynetPortal}/${contact}`;
+                }
                 var content = comment.getElementsByTagName("content")[0].innerHTML;
-                var innerHtml = `<div class='row'><div class='col-1 px-2 py-2 border-bottom'><center><img class='rounded-circle' width='50px' height='50px' src='https://www.gravatar.com/avatar/${contactMd5}'/></center></div><div class='col-11 px-2 py-2 border-bottom'><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${content}</div></div>`;
+                var innerHtml = `<div class='row'><div class='col-1 px-2 py-2 border-bottom'><center><img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/></center></div><div class='col-11 px-2 py-2 border-bottom'><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${content}</div></div>`;
                 var comments = document.getElementById("comments").innerHTML;
                 document.getElementById("comments").innerHTML += innerHtml;
             }
@@ -44,7 +48,7 @@
         }
         function refresh() {
             if(sessionStorage.getItem("refresh") == "true"){
-                //window.location.href = `http://${snsPortal}/${host}`;
+                window.location.href = `http://${snsPortal}/${host}`;
             }
         }
         function generateUUID() {
@@ -134,7 +138,7 @@
         </div>
         <div class="modal-body">
           <div class="md-form">
-            <input id="user" type="text" placeholder="User Name"/><input id="contact" type="text" placeholder="Contact"/><br/>
+            <input id="user" type="text" placeholder="User Name"/><input id="contact" type="text" placeholder="Skylink of Avatar"/><br/>
             <textarea id="content" class="md-textarea form-control" rows="3" placeholder="Message group..."></textarea>
           </div>
           <p id="results"></p>

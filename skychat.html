@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<head>
+    <title>Skychat</title>
+    <script>
+        var host = `chat.sns`
+        var snsPortal = `sns.redirectme.net`;
+        var skynetPortal = `siasky.net`;
+        var refresh = true;
+
+        window.onload = function() {
+            var snsComments = document.getElementById("sns_comments").getElementsByTagName("sns_comment");
+            
+            for (var i=0, max=snsComments.length; i < max; i++) {
+                var comment = snsComments[i];
+                var user = comment.getElementsByTagName("user")[0].innerHTML;
+                if (!user) {
+                    user = `<i>Anonomous</i>`
+                }
+                var epoch = comment.getElementsByTagName("epoch")[0].innerHTML;
+                var content = comment.getElementsByTagName("content")[0].innerHTML;
+                var innerHtml = `<hr/><p><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${content}</p>`;
+                var comments = document.getElementById("comments").innerHTML;
+                document.getElementById("comments").innerHTML += innerHtml;
+            }
+            var json = JSON.parse(new URLSearchParams(window.location.search).get(`json`));
+            if (json !== null && json.message !== null && json.message.length > 0) {
+              alert(json.message);
+            }
+            window.scrollTo(0,document.body.scrollHeight);
+            setTimeout(function(){if(refresh){window.location.href = `http://${snsPortal}/${host}`;};}, 3000);
+        }
+        function generateUUID() {
+            let uuid = '';
+            const cs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            for (let i = 0; i < 16; i++) {
+                uuid += cs.charAt(Math.floor(Math.random() * cs.length));
+            };
+            return uuid;
+        }
+        function clickToComment() {
+            refresh = false;
+            document.getElementById('comments').style.color = 'gray';
+            document.getElementById("click_to_comment").style.display = "none";
+            document.getElementById("comment_form").style.display = "block";
+            window.scrollTo(0,document.body.scrollHeight);
+        }
+        function cancel() {
+            window.location.href = `http://${snsPortal}/${host}`;
+        }
+        function save() {
+            document.getElementById('save-trigger-container').innerHTML 
+                = `<img src='https://${skynetPortal}/AAC959U5OeMq9BWWMxLPm2tAUMT1DezcuY9049QkUGhxjw'/> `
+                + `posting comment...`;
+            var pin = window.location.pathname.substring(1, 47);
+            var user = document.getElementById('user').value;
+            var epoch = Math.round(new Date().getTime() / 1000);
+            var contact = document.getElementById('contact').value;
+            var content = document.getElementById('content').value;
+            var snsComment = `<sns_comment>`
+                + `<pin>${pin}</pin>`
+                + `<user>${user}</user>`
+                + `<epoch>${epoch}</epoch>`
+                + `<contact>${contact}</contact>`
+                + `<content>${content}</content>`
+                + `</sns_comment>`;
+            var snsComments = "</sns_comments></body>";
+            fetch(`https://${skynetPortal}/${pin}`)
+                .then(response => response.text())
+                .then(result => {
+                    var newPage = result.substring(0, result.length-snsComments.length)+snsComment+snsComments;
+                    var blob = new Blob([newPage],{ type: 'text/html' });
+                    var formData = new FormData();
+                    formData.append('file', blob);
+                    const uuid = generateUUID();
+                    fetch(`https://${skynetPortal}/skynet/skyfile/${uuid}?filename=comment.html`, {method: 'POST',body: formData})
+                        .then(response => response.json())
+                        .then(result => {
+                            window.location.href = `http://${snsPortal}/comment?host=${host}&pin=${result.skylink}&user=${encodeURIComponent(user)}&epoch=${epoch}&contact=${encodeURIComponent(contact)}&content=${encodeURIComponent(content)}&redirect=${result.skylink}`;
+                        })
+                        .catch(error => {console.error('Error:', error)});
+                })
+        }
+    </script>
+</head>
+<body>
+<div id='comments'></div>
+<button id='click_to_comment' class='btn' type='button' onclick='clickToComment()'>Click to Comment</button><br/>
+<div id="comment_form" style="display: none;">
+    <input id="user" type="text" placeholder="User Name"/><input id="contact" type="text" placeholder="Contact"/><br/>
+    <textarea id='content' rows='10' cols='80' placeholder='Leave your comment here'></textarea><br/>
+    <div id='save-trigger-container'>
+    <button id='save-trigger' class='btn' type='button' onclick='save()'>Submit</button>
+    <button id='cancel-trigger' class='btn' type='button' onclick='cancel()'>Cancel</button><br/>
+    </div>
+</div>
+
+<sns_comments id="sns_comments" style="display: none"></sns_comments></body>

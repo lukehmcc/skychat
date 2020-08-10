@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <head>
     <title>Skychat</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.0.0/crypto-js.min.js"></script>
     <script>
         var host = `chat.sns`
         var snsPortal = `sns.redirectme.net`;
@@ -19,8 +26,9 @@
                     user = `<i>Anonomous</i>`
                 }
                 var epoch = comment.getElementsByTagName("epoch")[0].innerHTML;
+                var contactMd5 = CryptoJS.MD5(comment.getElementsByTagName("contact")[0].innerHTML);
                 var content = comment.getElementsByTagName("content")[0].innerHTML;
-                var innerHtml = `<hr/><p><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${content}</p>`;
+                var innerHtml = `<div class='row'><div class='col-1 px-2 py-2 border-bottom'><center><img class='rounded-circle' width='50px' height='50px' src='https://www.gravatar.com/avatar/${contactMd5}'/></center></div><div class='col-11 px-2 py-2 border-bottom'><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${content}</div></div>`;
                 var comments = document.getElementById("comments").innerHTML;
                 document.getElementById("comments").innerHTML += innerHtml;
             }
@@ -36,7 +44,7 @@
         }
         function refresh() {
             if(sessionStorage.getItem("refresh") == "true"){
-                window.location.href = `http://${snsPortal}/${host}`;
+                //window.location.href = `http://${snsPortal}/${host}`;
             }
         }
         function generateUUID() {
@@ -50,9 +58,7 @@
         function clickToComment() {
             sessionStorage.setItem("refresh", "false");
             document.getElementById('comments').style.color = 'gray';
-            document.getElementById("click_to_comment").style.display = "none";
-            document.getElementById("comment_form").style.display = "block";
-            window.scrollTo(0,document.body.scrollHeight);
+            $("#resultsModal").modal("show")
         }
         function cancel() {
             sessionStorage.setItem("refresh", "true");
@@ -94,16 +100,67 @@
         }
     </script>
 </head>
-<body>
-<div id='comments'></div>
+<body class="bg-dark text-white">
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-success">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="https://github.com/geo-gs/skychat">About</a>
+      </li>
+      <li class="nav-item" style="display: none;">
+        <a class="nav-link" href="#manage">Manage</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<br/><br/><br/>
+<div id='comments' class='container'></div>
 <button id='click_to_comment' class='btn' type='button' onclick='clickToComment()'>Click to Comment</button><br/>
-<div id="comment_form" style="display: none;">
-    <input id="user" type="text" placeholder="User Name"/><input id="contact" type="text" placeholder="Contact"/><br/>
-    <textarea id='content' rows='10' cols='80' placeholder='Leave your comment here'></textarea><br/>
-    <div id='save-trigger-container'>
-    <button id='save-trigger' class='btn' type='button' onclick='save()'>Submit</button>
-    <button id='cancel-trigger' class='btn' type='button' onclick='cancel()'>Cancel</button><br/>
+
+<div class="container">
+  <div class="modal" id="resultsModal" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-success">
+          <h5 class="modal-title"></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick='cancel()'>
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="md-form">
+            <input id="user" type="text" placeholder="User Name"/><input id="contact" type="text" placeholder="Contact"/><br/>
+            <textarea id="content" class="md-textarea form-control" rows="3" placeholder="Message group..."></textarea>
+          </div>
+          <p id="results"></p>
+          <div class="spinner-border" role="status" id="resultsModalSpinner">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+        <div class="modal-footer bg-success">
+          <div id='save-trigger-container'>
+            <button id='save-trigger' type='button' class="btn btn-secondary" onclick='save()'>Submit</button>
+            <button id='cancel-trigger' type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
+
+<br/><br/>
+<nav class="navbar navbar-expand-lg navbar-dark fixed-bottom bg-success">
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text">✎</span>
+    </div>
+    <input type="text" class="form-control" placeholder="Message group..." onclick='clickToComment();$("#resultsModal").modal("show")'>
+  </div>
+</nav>
 
 <sns_comments id="sns_comments" style="display: none"></sns_comments></body>

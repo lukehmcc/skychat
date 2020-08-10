@@ -5,7 +5,9 @@
         var host = `chat.sns`
         var snsPortal = `sns.redirectme.net`;
         var skynetPortal = `siasky.net`;
-        var refresh = true;
+        if (sessionStorage.getItem("refresh") === null) {
+            sessionStorage.setItem("refresh", "true");
+        }
 
         window.onload = function() {
             var snsComments = document.getElementById("sns_comments").getElementsByTagName("sns_comment");
@@ -27,7 +29,15 @@
               alert(json.message);
             }
             window.scrollTo(0,document.body.scrollHeight);
-            setTimeout(function(){if(refresh){window.location.href = `http://${snsPortal}/${host}`;};}, 3000);
+            setTimeout(function(){refresh();}, 3000);
+            if (sessionStorage.getItem("refresh") == "false") {
+                clickToComment();
+            }
+        }
+        function refresh() {
+            if(sessionStorage.getItem("refresh") == "true"){
+                window.location.href = `http://${snsPortal}/${host}`;
+            }
         }
         function generateUUID() {
             let uuid = '';
@@ -38,13 +48,14 @@
             return uuid;
         }
         function clickToComment() {
-            refresh = false;
+            sessionStorage.setItem("refresh", "false");
             document.getElementById('comments').style.color = 'gray';
             document.getElementById("click_to_comment").style.display = "none";
             document.getElementById("comment_form").style.display = "block";
             window.scrollTo(0,document.body.scrollHeight);
         }
         function cancel() {
+            sessionStorage.setItem("refresh", "true");
             window.location.href = `http://${snsPortal}/${host}`;
         }
         function save() {
@@ -75,6 +86,7 @@
                     fetch(`https://${skynetPortal}/skynet/skyfile/${uuid}?filename=comment.html`, {method: 'POST',body: formData})
                         .then(response => response.json())
                         .then(result => {
+                            sessionStorage.setItem("refresh", "true");
                             window.location.href = `http://${snsPortal}/comment?host=${host}&pin=${result.skylink}&user=${encodeURIComponent(user)}&epoch=${epoch}&contact=${encodeURIComponent(contact)}&content=${encodeURIComponent(content)}&redirect=${result.skylink}`;
                         })
                         .catch(error => {console.error('Error:', error)});

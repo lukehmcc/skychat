@@ -58,7 +58,9 @@
                 } else {
                     contactImg = `https://www.gravatar.com/avatar/${CryptoJS.MD5(contact)}`
                 }
-                document.getElementById("comment_modal_avatar").innerHTML = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/>`;
+                var avatarImg = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/>`;
+                document.getElementById("comment_modal_avatar").innerHTML = avatarImg;
+                document.getElementById("nav_avatar").innerHTML = avatarImg;
             }
         }
         function refresh() {
@@ -76,14 +78,12 @@
         }
         function clickToComment() {
             sessionStorage.setItem("refresh", "false");
-            document.getElementById('comments').style.color = 'gray';
             document.getElementById("login_modal").style.display = "none";
             document.getElementById("comment_modal").style.display = "block";
             $("#resultsModal").modal("show");
         }
         function clickToLogin() {
             sessionStorage.setItem("refresh", "false");
-            document.getElementById('comments').style.color = 'gray';
             document.getElementById("login_modal").style.display = "block";
             document.getElementById("comment_modal").style.display = "none";
             $("#resultsModal").modal("show");
@@ -148,6 +148,7 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
+      <li id="nav_avatar" class="nav-item"></li>
       <li class="nav-item">
         <a class="nav-link text-dark" href="#" onclick="logout()">Logout</a>
       </li>

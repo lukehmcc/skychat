@@ -58,9 +58,7 @@
                 } else {
                     contactImg = `https://www.gravatar.com/avatar/${CryptoJS.MD5(contact)}`
                 }
-                var avatarImg = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/>`;
-                document.getElementById("comment_modal_avatar").innerHTML = avatarImg;
-                document.getElementById("nav_avatar").innerHTML = avatarImg;
+                document.getElementById("comment_modal_avatar").innerHTML = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/> ${localStorage.getItem("user")}`;
             }
         }
         function refresh() {
@@ -95,6 +93,12 @@
         function login() {
             localStorage.setItem("user", document.getElementById('user').value);
             localStorage.setItem("contact", document.getElementById('contact').value);
+            sessionStorage.setItem("refresh", "true");
+            window.location.href = `http://${snsPortal}/${host}`;
+        }
+        function anonomous_login() {
+            localStorage.setItem("user", "Anonomous");
+            localStorage.setItem("contact", "");
             sessionStorage.setItem("refresh", "true");
             window.location.href = `http://${snsPortal}/${host}`;
         }
@@ -148,7 +152,6 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-      <li id="nav_avatar" class="nav-item"></li>
       <li class="nav-item">
         <a class="nav-link text-dark" href="#" onclick="logout()">Logout</a>
       </li>
@@ -180,6 +183,7 @@
         </div>
         <div class="modal-footer bg-success">
           <button type='button' class="btn btn-secondary" onclick='login()'>Submit</button>
+          <button type='button' class="btn btn-secondary" onclick='anonomous_login()'>Skip</button>
         </div>
       </div>        
       <div id="comment_modal" class="modal-content" style="display: none;">
@@ -209,7 +213,7 @@
   </div>
 </div>
 
-<br/><br/>
+<br/><br/><br/>
 <nav class="navbar navbar-expand-lg navbar-dark fixed-bottom bg-success">
   <div class="input-group mb-3">
     <div class="input-group-prepend">

@@ -28,8 +28,10 @@
                 var epoch = comment.getElementsByTagName("epoch")[0].innerHTML;
                 var contact = comment.getElementsByTagName("contact")[0].innerHTML;
                 var contactImg = "";
-                if (contact.length == 46) {
-                   contactImg = `https://${skynetPortal}/${contact}`;
+                if (contact.length == 46 && contact.indexOf("@") == -1) {
+                    contactImg = `https://${skynetPortal}/${contact}/`;
+                } else {
+                    contactImg = `https://www.gravatar.com/avatar/${CryptoJS.MD5(contact)}`
                 }
                 var content = comment.getElementsByTagName("content")[0].innerHTML;
                 var innerHtml = `<div class='row'><div class='col-1 px-2 py-2 border-bottom'><center><img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/></center></div><div class='col-11 px-2 py-2 border-bottom'><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${content}</div></div>`;
@@ -44,6 +46,19 @@
             setTimeout(function(){refresh();}, 3000);
             if (sessionStorage.getItem("refresh") == "false") {
                 clickToComment();
+            }
+            if (localStorage.getItem("user") === null) {
+                clickToLogin();
+            }
+            if (localStorage.getItem("contact") !== null) {
+                var contact = localStorage.getItem("contact");
+                var contactImg = "";
+                if (contact.length == 46 && contact.indexOf("@") == -1) {
+                    contactImg = `https://${skynetPortal}/${contact}/`;
+                } else {
+                    contactImg = `https://www.gravatar.com/avatar/${CryptoJS.MD5(contact)}`
+                }
+                document.getElementById("comment_modal_avatar").innerHTML = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/>`;
             }
         }
         function refresh() {
@@ -62,10 +77,31 @@
         function clickToComment() {
             sessionStorage.setItem("refresh", "false");
             document.getElementById('comments').style.color = 'gray';
-            $("#resultsModal").modal("show")
+            document.getElementById("login_modal").style.display = "none";
+            document.getElementById("comment_modal").style.display = "block";
+            $("#resultsModal").modal("show");
+        }
+        function clickToLogin() {
+            sessionStorage.setItem("refresh", "false");
+            document.getElementById('comments').style.color = 'gray';
+            document.getElementById("login_modal").style.display = "block";
+            document.getElementById("comment_modal").style.display = "none";
+            $("#resultsModal").modal("show");
         }
         function cancel() {
             sessionStorage.setItem("refresh", "true");
+            window.location.href = `http://${snsPortal}/${host}`;
+        }
+        function login() {
+            localStorage.setItem("user", document.getElementById('user').value);
+            localStorage.setItem("contact", document.getElementById('contact').value);
+            sessionStorage.setItem("refresh", "true");
+            window.location.href = `http://${snsPortal}/${host}`;
+        }
+        function logout() {
+            localStorage.removeItem("user");
+            localStorage.removeItem("contact");
+            document.getElementById("comment_modal_avatar").innerHTML = "";
             window.location.href = `http://${snsPortal}/${host}`;
         }
         function save() {
@@ -73,9 +109,9 @@
                 = `<img src='https://${skynetPortal}/AAC959U5OeMq9BWWMxLPm2tAUMT1DezcuY9049QkUGhxjw'/> `
                 + `posting comment...`;
             var pin = window.location.pathname.substring(1, 47);
-            var user = document.getElementById('user').value;
+            var user = localStorage.getItem('user');
             var epoch = Math.round(new Date().getTime() / 1000);
-            var contact = document.getElementById('contact').value;
+            var contact = localStorage.getItem('contact');
             var content = document.getElementById('content').value;
             var snsComment = `<sns_comment>`
                 + `<pin>${pin}</pin>`
@@ -113,6 +149,9 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
+        <a class="nav-link text-dark" href="#" onclick="logout()">Logout</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link text-dark" href="https://github.com/geo-gs/skychat">About</a>
       </li>
       <li class="nav-item" style="display: none;">
@@ -129,16 +168,29 @@
 <div class="container">
   <div class="modal" id="resultsModal" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" style="display: none;">
     <div class="modal-dialog">
-      <div class="modal-content">
+      <div id="login_modal" class="modal-content" style="display: none;">
         <div class="modal-header bg-success">
-          <h5 class="modal-title"></h5>
+          <h5 class="modal-title">Login</h5>
+        </div>
+        <div class="modal-body">
+          <div class="md-form">
+            <input id="user" type="text" placeholder="User Name"/><br/>
+            <input id="contact" type="text" placeholder="Skylink of Avatar"/><br/>
+          </div>
+        </div>
+        <div class="modal-footer bg-success">
+          <button type='button' class="btn btn-secondary" onclick='login()'>Submit</button>
+        </div>
+      </div>        
+      <div id="comment_modal" class="modal-content" style="display: none;">
+        <div class="modal-header bg-success">
+          <h5 id="comment_modal_avatar" class="modal-title"></h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick='cancel()'>
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
           <div class="md-form">
-            <input id="user" type="text" placeholder="User Name"/><input id="contact" type="text" placeholder="Skylink of Avatar"/><br/>
             <textarea id="content" class="md-textarea form-control" rows="3" placeholder="Message group..."></textarea>
           </div>
           <p id="results"></p>
@@ -148,7 +200,7 @@
         </div>
         <div class="modal-footer bg-success">
           <div id='save-trigger-container'>
-            <button id='save-trigger' type='button' class="btn btn-secondary" onclick='save()'>Submit</button>
+            <button id='save-trigger' type='button' class="btn btn-secondary" onclick='save()'>Comment</button>
             <button id='cancel-trigger' type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
           </div>
         </div>

@@ -74,9 +74,9 @@
         function refresh() {
             if(sessionStorage.getItem("skychat_state") == "chat"){
                 if ((window.innerHeight + Math.ceil(window.pageYOffset + 1)) < document.body.offsetHeight) {
-                    setTimeout(function(){refresh();}, 100);
+                    setTimeout(function(){refresh();}, 250);
                 } else if (document.getElementById("navbar-toggler").offsetHeight == document.getElementById("nav_about").offsetHeight) {
-                    setTimeout(function(){refresh();}, 100);
+                    setTimeout(function(){refresh();}, 250);
                 } else {
                     window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
                 }

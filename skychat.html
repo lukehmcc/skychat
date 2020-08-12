@@ -11,6 +11,7 @@
     <script>
         var host = `chat.sns`
         var snsPortal = `sns.redirectme.net`;
+        var skynetPortal = window.location.hostname;
         if (sessionStorage.getItem("refresh") === null) {
             sessionStorage.setItem("refresh", "true");
         }
@@ -62,7 +63,7 @@
         }
         function refresh() {
             if(sessionStorage.getItem("refresh") == "true"){
-                window.location.href = `http://${snsPortal}/${host}`;
+                window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
             }
         }
         function generateUUID() {
@@ -87,7 +88,7 @@
         }
         function cancel() {
             sessionStorage.setItem("refresh", "true");
-            window.location.href = `http://${snsPortal}/${host}`;
+            window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
         }
         function login() {
             document.getElementById('login-trigger-container').innerHTML 
@@ -108,11 +109,11 @@
                     success: function (data, textStatus, jqXHR) {
                         localStorage.setItem("contact", data.skylink);
                         sessionStorage.setItem("refresh", "true");
-                        window.location.href = `http://${snsPortal}/${host}`;
+                        window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         sessionStorage.setItem("refresh", "true");
-                        window.location.href = `http://${snsPortal}/${host}`;
+                        window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
                     }
                 });
             }
@@ -121,13 +122,13 @@
             localStorage.setItem("user", "Anonomous");
             localStorage.setItem("contact", "");
             sessionStorage.setItem("refresh", "true");
-            window.location.href = `http://${snsPortal}/${host}`;
+            window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
         }
         function logout() {
             localStorage.removeItem("user");
             localStorage.removeItem("contact");
             document.getElementById("comment_modal_avatar").innerHTML = "";
-            window.location.href = `http://${snsPortal}/${host}`;
+            window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
         }
         function save() {
             document.getElementById('save-trigger-container').innerHTML 
@@ -157,7 +158,7 @@
                         .then(response => response.json())
                         .then(result => {
                             sessionStorage.setItem("refresh", "true");
-                            window.location.href = `http://${snsPortal}/comment?host=${host}&pin=${result.skylink}&user=${encodeURIComponent(user)}&epoch=${epoch}&contact=${encodeURIComponent(contact)}&content=${encodeURIComponent(content)}&redirect=${result.skylink}`;
+                            window.location.href = `http://${snsPortal}/comment?host=${host}&pin=${result.skylink}&user=${encodeURIComponent(user)}&epoch=${epoch}&contact=${encodeURIComponent(contact)}&content=${encodeURIComponent(content)}&redirect=${result.skylink}&portal=${skynetPortal}`;
                         })
                         .catch(error => {console.error('Error:', error)});
                 })

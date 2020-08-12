@@ -20,19 +20,19 @@
             
             for (var i=0, max=snsComments.length; i < max; i++) {
                 var comment = snsComments[i];
-                var user = comment.getElementsByTagName("user")[0].innerHTML;
+                var user = atob(comment.getElementsByTagName("user")[0].innerHTML).replace(/</g,"&lt;").replace(/>/g,"&gt;");
                 if (!user) {
                     user = `<i>Anonomous</i>`
                 }
                 var epoch = comment.getElementsByTagName("epoch")[0].innerHTML;
-                var contact = comment.getElementsByTagName("contact")[0].innerHTML;
+                var contact = atob(comment.getElementsByTagName("contact")[0].innerHTML).replace(/</g,"&lt;").replace(/>/g,"&gt;");
                 var contactImg = "";
                 if (contact.length == 46 && contact.indexOf("@") == -1) {
                     contactImg = `/${contact}/`;
                 } else {
                     contactImg = `https://www.gravatar.com/avatar/${CryptoJS.MD5(contact)}`
                 }
-                var content = comment.getElementsByTagName("content")[0].innerHTML;
+                var content = atob(comment.getElementsByTagName("content")[0].innerHTML).replace(/</g,"&lt;").replace(/>/g,"&gt;");
                 var innerHtml = `<div class='row'><div class='col-1 px-2 py-2 border-bottom'><center><img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/></center></div><div class='col-11 px-2 py-2 border-bottom'><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${content}</div></div>`;
                 var comments = document.getElementById("comments").innerHTML;
                 document.getElementById("comments").innerHTML += innerHtml;
@@ -154,10 +154,10 @@
             document.getElementById('save-trigger-container').innerHTML 
                 = `<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>`;
             var pin = window.location.pathname.substring(1, 47);
-            var user = localStorage.getItem('user');
+            var user = btoa(localStorage.getItem('user'));
             var epoch = Math.round(new Date().getTime() / 1000);
-            var contact = localStorage.getItem('contact');
-            var content = document.getElementById('content').value;
+            var contact = btoa(localStorage.getItem('contact'));
+            var content = btoa(document.getElementById('content').value);
             var snsComment = `<sns_comment>`
                 + `<pin>${pin}</pin>`
                 + `<user>${user}</user>`

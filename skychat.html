@@ -73,10 +73,12 @@
         }
         function refresh() {
             if(sessionStorage.getItem("skychat_state") == "chat"){
-                if ((window.innerHeight + Math.ceil(window.pageYOffset + 1)) >= document.body.offsetHeight) {
-                    window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
-                } else {
+                if ((window.innerHeight + Math.ceil(window.pageYOffset + 1)) < document.body.offsetHeight) {
                     setTimeout(function(){refresh();}, 100);
+                } else if (document.getElementById("nav_about").offsetHeight > 1) {
+                    setTimeout(function(){refresh();}, 100);
+                } else {
+                    window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
                 }
             }
         }
@@ -237,7 +239,7 @@
       <li class="nav-item">
         <a class="nav-link text-dark" href="#" onclick="newChat()">New</a>
       </li>
-      <li class="nav-item">
+      <li id="nav_about" class="nav-item">
         <a class="nav-link text-dark" href="https://github.com/geo-gs/skychat">About</a>
       </li>
       <li class="nav-item" style="display: none;">

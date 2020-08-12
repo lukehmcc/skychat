@@ -9,7 +9,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.0.0/crypto-js.min.js"></script>
     <script>
-        var host = `chat.sns`
         var snsPortal = `sns.redirectme.net`;
         var skynetPortal = window.location.hostname;
         if (sessionStorage.getItem("skychat_state") === null) {
@@ -65,9 +64,12 @@
                 document.getElementById("comment_modal_avatar").innerHTML = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/> ${localStorage.getItem("user")}`;
             }
         }
+        function getHost() {
+            return document.getElementById("skychat_host").innerHTML;
+        }
         function refresh() {
             if(sessionStorage.getItem("skychat_state") == "chat"){
-                window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
+                window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
             }
         }
         function generateUUID() {
@@ -102,11 +104,11 @@
         }
         function cancel() {
             sessionStorage.setItem("skychat_state", "chat");
-            window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
+            window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
         }
         function portal() {
             sessionStorage.setItem("skychat_state", "chat");
-            window.location.href = `http://${document.getElementById('portal').value}/${host}?portal=${skynetPortal}`;
+            window.location.href = `http://${document.getElementById('portal').value}/${getHost()}?portal=${skynetPortal}`;
         }
         function login() {
             document.getElementById('login-trigger-container').innerHTML 
@@ -127,11 +129,11 @@
                     success: function (data, textStatus, jqXHR) {
                         localStorage.setItem("contact", data.skylink);
                         sessionStorage.setItem("skychat_state", "chat");
-                        window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
+                        window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         sessionStorage.setItem("skychat_state", "chat");
-                        window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
+                        window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
                     }
                 });
             }
@@ -140,13 +142,13 @@
             localStorage.setItem("user", "Anonomous");
             localStorage.setItem("contact", "");
             sessionStorage.setItem("skychat_state", "chat");
-            window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
+            window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
         }
         function logout() {
             localStorage.removeItem("user");
             localStorage.removeItem("contact");
             document.getElementById("comment_modal_avatar").innerHTML = "";
-            window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
+            window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
         }
         function save() {
             document.getElementById('save-trigger-container').innerHTML 
@@ -176,7 +178,31 @@
                         .then(response => response.json())
                         .then(result => {
                             sessionStorage.setItem("skychat_state", "chat");
-                            window.location.href = `http://${snsPortal}/comment?host=${host}&pin=${result.skylink}&user=${encodeURIComponent(user)}&epoch=${epoch}&contact=${encodeURIComponent(contact)}&content=${encodeURIComponent(content)}&redirect=${result.skylink}&portal=${skynetPortal}`;
+                            window.location.href = `http://${snsPortal}/comment?host=${getHost()}&pin=${result.skylink}&user=${encodeURIComponent(user)}&epoch=${epoch}&contact=${encodeURIComponent(contact)}&content=${encodeURIComponent(content)}&redirect=${result.skylink}&portal=${skynetPortal}`;
+                        })
+                        .catch(error => {console.error('Error:', error)});
+                })
+        }
+        function newChat() {
+            sessionStorage.setItem("skychat_state", "newChat");
+            var pin = window.location.pathname.substring(1, 47);
+            fetch(`/${pin}/`)
+                .then(response => response.text())
+                .then(result => {
+                    var host = `${generateUUID()}.sns`;
+                    var skychatDiv = `<skychat id="skychat_host" style="display: none">`;
+                    var endingIndex = result.lastIndexOf(skychatDiv);
+                    var newPage = result.substring(0, endingIndex) 
+                    + `${skychatDiv}${host}</skychat><sns_comments id="sns_comments" style="display: none"></sns_comments></body>`;
+                    var blob = new Blob([newPage],{ type: 'text/html' });
+                    var formData = new FormData();
+                    formData.append('file', blob);
+                    const uuid = generateUUID();
+                    fetch(`/skynet/skyfile/${uuid}?filename=comment.html`, {method: 'POST',body: formData})
+                        .then(response => response.json())
+                        .then(result => {
+                            sessionStorage.setItem("skychat_state", "chat");
+                            window.location.href = `http://${snsPortal}/register?host=${host}&pin=${result.skylink}&password=${generateUUID()}&redirect=${result.skylink}&portal=${skynetPortal}`;
                         })
                         .catch(error => {console.error('Error:', error)});
                 })
@@ -196,6 +222,9 @@
       </li>
       <li class="nav-item">
         <a class="nav-link text-dark" href="#" onclick="clickToChangePortal()">Portals</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="#" onclick="newChat()">New</a>
       </li>
       <li class="nav-item">
         <a class="nav-link text-dark" href="https://github.com/geo-gs/skychat">About</a>
@@ -298,4 +327,4 @@
   </div>
 </nav>
 
-<sns_comments id="sns_comments" style="display: none"></sns_comments></body>
+<skychat id="skychat_host" style="display: none">chat.sns</skychat><sns_comments id="sns_comments" style="display: none"></sns_comments></body>

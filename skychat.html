@@ -23,11 +23,14 @@
                 var user = atob(comment.getElementsByTagName("user")[0].innerHTML).replace(/</g,"&lt;").replace(/>/g,"&gt;");
                 if (!user) {
                     user = `<i>Anonomous</i>`
+                } else if (user.length > 35) {
+                    user = user.substring(0, 35) + `…`;
                 }
                 var epoch = comment.getElementsByTagName("epoch")[0].innerHTML;
                 var contact = atob(comment.getElementsByTagName("contact")[0].innerHTML).replace(/</g,"&lt;").replace(/>/g,"&gt;");
                 var contactImg = "";
-                if (contact.length == 46 && contact.indexOf("@") == -1) {
+                var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
+                if (pinRegex.test(contact)) {
                     contactImg = `/${contact}/`;
                 } else {
                     contactImg = `https://www.gravatar.com/avatar/${CryptoJS.MD5(contact)}`
@@ -56,7 +59,8 @@
             if (localStorage.getItem("contact") !== null) {
                 var contact = localStorage.getItem("contact");
                 var contactImg = "";
-                if (contact.length == 46 && contact.indexOf("@") == -1) {
+                var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
+                if (pinRegex.test(contact)) {
                     contactImg = `/${contact}/`;
                 } else {
                     contactImg = `https://www.gravatar.com/avatar/${CryptoJS.MD5(contact)}`

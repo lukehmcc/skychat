@@ -12,8 +12,8 @@
         var host = `chat.sns`
         var snsPortal = `sns.redirectme.net`;
         var skynetPortal = window.location.hostname;
-        if (sessionStorage.getItem("refresh") === null) {
-            sessionStorage.setItem("refresh", "true");
+        if (sessionStorage.getItem("skychat_state") === null) {
+            sessionStorage.setItem("skychat_state", "chat");
         }
 
         window.onload = function() {
@@ -44,8 +44,12 @@
             }
             window.scrollTo(0,document.body.scrollHeight);
             setTimeout(function(){refresh();}, 3000);
-            if (sessionStorage.getItem("refresh") == "false") {
+            if (sessionStorage.getItem("skychat_state") == "compose") {
                 clickToComment();
+            } else if (sessionStorage.getItem("skychat_state") == "login") {
+                clickToLogin();
+            } else if (sessionStorage.getItem("skychat_state") == "portal") {
+                clickToChangePortal();
             }
             if (localStorage.getItem("user") === null) {
                 clickToLogin();
@@ -62,7 +66,7 @@
             }
         }
         function refresh() {
-            if(sessionStorage.getItem("refresh") == "true"){
+            if(sessionStorage.getItem("skychat_state") == "chat"){
                 window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
             }
         }
@@ -74,21 +78,35 @@
             };
             return uuid;
         }
-        function clickToComment() {
-            sessionStorage.setItem("refresh", "false");
-            document.getElementById("login_modal").style.display = "none";
-            document.getElementById("comment_modal").style.display = "block";
-            $("#resultsModal").modal("show");
-        }
         function clickToLogin() {
-            sessionStorage.setItem("refresh", "false");
+            sessionStorage.setItem("skychat_state", "login");
             document.getElementById("login_modal").style.display = "block";
+            document.getElementById("portal_modal").style.display = "none";
             document.getElementById("comment_modal").style.display = "none";
             $("#resultsModal").modal("show");
         }
+        function clickToChangePortal() {
+            sessionStorage.setItem("skychat_state", "portal");
+            document.getElementById("login_modal").style.display = "none";
+            document.getElementById("portal_modal").style.display = "block";
+            document.getElementById("comment_modal").style.display = "none";
+            document.getElementById('portal').value = skynetPortal;
+            $("#resultsModal").modal("show");
+        }
+        function clickToComment() {
+            sessionStorage.setItem("skychat_state", "compose");
+            document.getElementById("login_modal").style.display = "none";
+            document.getElementById("portal_modal").style.display = "none";
+            document.getElementById("comment_modal").style.display = "block";
+            $("#resultsModal").modal("show");
+        }
         function cancel() {
-            sessionStorage.setItem("refresh", "true");
+            sessionStorage.setItem("skychat_state", "chat");
             window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
+        }
+        function portal() {
+            sessionStorage.setItem("skychat_state", "chat");
+            window.location.href = `http://${document.getElementById('portal').value}/${host}?portal=${skynetPortal}`;
         }
         function login() {
             document.getElementById('login-trigger-container').innerHTML 
@@ -108,11 +126,11 @@
                     dataType: 'json',
                     success: function (data, textStatus, jqXHR) {
                         localStorage.setItem("contact", data.skylink);
-                        sessionStorage.setItem("refresh", "true");
+                        sessionStorage.setItem("skychat_state", "chat");
                         window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        sessionStorage.setItem("refresh", "true");
+                        sessionStorage.setItem("skychat_state", "chat");
                         window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
                     }
                 });
@@ -121,7 +139,7 @@
         function anonomous_login() {
             localStorage.setItem("user", "Anonomous");
             localStorage.setItem("contact", "");
-            sessionStorage.setItem("refresh", "true");
+            sessionStorage.setItem("skychat_state", "chat");
             window.location.href = `http://${snsPortal}/${host}?portal=${skynetPortal}`;
         }
         function logout() {
@@ -157,7 +175,7 @@
                     fetch(`/skynet/skyfile/${uuid}?filename=comment.html`, {method: 'POST',body: formData})
                         .then(response => response.json())
                         .then(result => {
-                            sessionStorage.setItem("refresh", "true");
+                            sessionStorage.setItem("skychat_state", "chat");
                             window.location.href = `http://${snsPortal}/comment?host=${host}&pin=${result.skylink}&user=${encodeURIComponent(user)}&epoch=${epoch}&contact=${encodeURIComponent(contact)}&content=${encodeURIComponent(content)}&redirect=${result.skylink}&portal=${skynetPortal}`;
                         })
                         .catch(error => {console.error('Error:', error)});
@@ -175,6 +193,9 @@
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
         <a class="nav-link text-dark" href="#" onclick="logout()">Logout</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="#" onclick="clickToChangePortal()">Portals</a>
       </li>
       <li class="nav-item">
         <a class="nav-link text-dark" href="https://github.com/geo-gs/skychat">About</a>
@@ -211,7 +232,7 @@
               <form id="contact_form">
                 <input id="contact" type="file" class="form-control">
               </form>
-            </div>  
+            </div>
           </div>
         </div>
         <div class="modal-footer bg-success">
@@ -220,7 +241,28 @@
             <button type='button' class="btn btn-secondary" onclick='anonomous_login()'>Skip</button>
           </div>
         </div>
-      </div>        
+      </div>
+      <div id="portal_modal" class="modal-content" style="display: none;">
+        <div class="modal-header bg-success">
+          <h5 class="modal-title">Portal</h5>
+        </div>
+        <div class="modal-body">
+          <div class="md-form">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Portal</span>
+              </div>
+              <input id="portal" type="text" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-success">
+          <div id='login-trigger-container'>
+            <button type='button' class="btn btn-secondary" onclick='portal()'>Change</button>
+            <button type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
+          </div>
+        </div>
+      </div>
       <div id="comment_modal" class="modal-content" style="display: none;">
         <div class="modal-header bg-success">
           <h5 id="comment_modal_avatar" class="modal-title"></h5>
@@ -238,7 +280,7 @@
         <div class="modal-footer bg-success">
           <div id='save-trigger-container'>
             <button id='save-trigger' type='button' class="btn btn-secondary" onclick='save()'>Comment</button>
-            <button id='cancel-trigger' type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
+            <button type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
           </div>
         </div>
       </div>

@@ -73,8 +73,6 @@
         }
         function refresh() {
             if(sessionStorage.getItem("skychat_state") == "chat"){
-                console.log(document.getElementById("navbar-toggler").offsetHeight);
-                console.log(document.getElementById("nav_about").offsetHeight);
                 if ((window.innerHeight + Math.ceil(window.pageYOffset + 1)) < document.body.offsetHeight) {
                     setTimeout(function(){refresh();}, 100);
                 } else if (document.getElementById("navbar-toggler").offsetHeight == document.getElementById("nav_about").offsetHeight) {

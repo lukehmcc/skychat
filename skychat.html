@@ -45,7 +45,7 @@
               alert(json.message);
             }
             window.scrollTo(0,document.body.scrollHeight);
-            setTimeout(function(){refresh();}, 3000);
+            setTimeout(function(){refresh();}, 9999);
             if (sessionStorage.getItem("skychat_state") == "compose") {
                 clickToComment();
             } else if (sessionStorage.getItem("skychat_state") == "login") {

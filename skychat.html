@@ -73,7 +73,11 @@
         }
         function refresh() {
             if(sessionStorage.getItem("skychat_state") == "chat"){
-                window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
+                if ((window.innerHeight + Math.ceil(window.pageYOffset + 1)) >= document.body.offsetHeight) {
+                    window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
+                } else {
+                    setTimeout(function(){refresh();}, 100);
+                }
             }
         }
         function generateUUID() {

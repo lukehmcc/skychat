@@ -108,7 +108,7 @@
         }
         function portal() {
             sessionStorage.setItem("skychat_state", "chat");
-            window.location.href = `http://${document.getElementById('portal').value}/${getHost()}?portal=${skynetPortal}`;
+            window.location.href = `http://${snsPortal}/${getHost()}?portal=${document.getElementById('portal').value}`;
         }
         function login() {
             document.getElementById('login-trigger-container').innerHTML 

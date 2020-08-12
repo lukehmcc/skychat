@@ -136,6 +136,10 @@
                         window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
                     }
                 });
+            } else {
+                localStorage.setItem("contact", data.skylink);
+                sessionStorage.setItem("skychat_state", "chat");
+                window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
             }
         }
         function anonomous_login() {

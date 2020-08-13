@@ -54,14 +54,14 @@
             var commentsHTML = "";
             for (var i = snsComments.length-1, min = i - (commentStep * commentOffset); i >= 0 && i > min; i--) {
                 var comment = snsComments[i];
-                var user = atob(comment.getElementsByTagName("user")[0].innerHTML).replace(/</g,"&lt;").replace(/>/g,"&gt;");
+                var user = decrypt(comment.getElementsByTagName("user")[0].innerHTML);
                 if (!user) {
                     user = `<i>Anonomous</i>`
                 } else if (user.length > 35) {
                     user = user.substring(0, 35) + `…`;
                 }
                 var epoch = comment.getElementsByTagName("epoch")[0].innerHTML;
-                var contact = atob(comment.getElementsByTagName("contact")[0].innerHTML).replace(/</g,"&lt;").replace(/>/g,"&gt;");
+                var contact = decrypt(comment.getElementsByTagName("contact")[0].innerHTML);
                 var contactImg = "";
                 var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
                 if (pinRegex.test(contact)) {
@@ -69,7 +69,7 @@
                 } else {
                     contactImg = anonymousImg
                 }
-                var content = atob(comment.getElementsByTagName("content")[0].innerHTML).replace(/</g,"&lt;").replace(/>/g,"&gt;");
+                var content = decrypt(comment.getElementsByTagName("content")[0].innerHTML, "<i>encrypted</i>");
                 var commentHtml = `<div id='comment_${i}' class='row'><div class='col-1 px-2 py-2 border-top'><center><img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/></center></div><div class='col-11 px-2 py-2 border-top'><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${content}</div></div>`;
                 commentsHTML = commentHtml + commentsHTML;
             }
@@ -97,6 +97,31 @@
                 }
             }
         }
+        function getSecret() {
+            if (localStorage.getItem(getHost() + "_secret") === null) {
+                localStorage.setItem(getHost() + "_secret", "plaintext");
+            }
+            return localStorage.getItem(getHost() + "_secret");
+        }
+        function stripXSS(data) {
+            return data.replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        }
+        function encrypt(data) {
+            if (getSecret() == "base64") {
+                return btoa(data);
+            }
+            return CryptoJS.AES.encrypt(data, getSecret()).toString();
+        }
+        function decrypt(data, opt) {
+            if (getSecret() == "base64") {
+                return stripXSS(atob(data));
+            }
+            try {
+                return stripXSS(CryptoJS.AES.decrypt(data, getSecret()).toString(CryptoJS.enc.Utf8));
+            } catch(err) {
+                return opt;
+            }
+        }
         function generateUUID() {
             let uuid = '';
             const cs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -108,13 +133,24 @@
         function clickToLogin() {
             sessionStorage.setItem("skychat_state", "login");
             document.getElementById("login_modal").style.display = "block";
+            document.getElementById("secret_modal").style.display = "none";
             document.getElementById("portal_modal").style.display = "none";
             document.getElementById("comment_modal").style.display = "none";
+            $("#resultsModal").modal("show");
+        }
+        function clickToChangeSecret() {
+            sessionStorage.setItem("skychat_state", "secret");
+            document.getElementById("login_modal").style.display = "none";
+            document.getElementById("secret_modal").style.display = "block";
+            document.getElementById("portal_modal").style.display = "none";
+            document.getElementById("comment_modal").style.display = "none";
+            document.getElementById('portal').value = skynetPortal;
             $("#resultsModal").modal("show");
         }
         function clickToChangePortal() {
             sessionStorage.setItem("skychat_state", "portal");
             document.getElementById("login_modal").style.display = "none";
+            document.getElementById("secret_modal").style.display = "none";
             document.getElementById("portal_modal").style.display = "block";
             document.getElementById("comment_modal").style.display = "none";
             document.getElementById('portal').value = skynetPortal;
@@ -123,12 +159,18 @@
         function clickToComment() {
             sessionStorage.setItem("skychat_state", "compose");
             document.getElementById("login_modal").style.display = "none";
+            document.getElementById("secret_modal").style.display = "none";
             document.getElementById("portal_modal").style.display = "none";
             document.getElementById("comment_modal").style.display = "block";
             $("#resultsModal").modal("show");
         }
         function cancel() {
             sessionStorage.setItem("skychat_state", "chat");
+            window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
+        }
+        function secret() {
+            sessionStorage.setItem("skychat_state", "chat");
+            localStorage.setItem(getHost() + "_secret", document.getElementById('secret').value);
             window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
         }
         function portal() {
@@ -182,10 +224,10 @@
             document.getElementById('save-trigger-container').innerHTML 
                 = `<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>`;
             var pin = window.location.pathname.substring(1, 47);
-            var user = btoa(localStorage.getItem('user'));
+            var user = encrypt(localStorage.getItem('user'));
             var epoch = Math.round(new Date().getTime() / 1000);
-            var contact = btoa(localStorage.getItem('contact'));
-            var content = btoa(document.getElementById('content').value);
+            var contact = encrypt(localStorage.getItem('contact'));
+            var content = encrypt(document.getElementById('content').value);
             var snsComment = `<sns_comment>`
                 + `<pin>${pin}</pin>`
                 + `<user>${user}</user>`
@@ -249,6 +291,9 @@
         <a class="nav-link text-dark" href="#" onclick="logout()">Logout</a>
       </li>
       <li class="nav-item">
+        <a class="nav-link text-dark" href="#" onclick="clickToChangeSecret()">Secret</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link text-dark" href="#" onclick="clickToChangePortal()">Portals</a>
       </li>
       <li class="nav-item">
@@ -299,6 +344,27 @@
           <div id='login-trigger-container'>
             <button type='button' class="btn btn-secondary" onclick='login()'>Submit</button>
             <button type='button' class="btn btn-secondary" onclick='anonomous_login()'>Skip</button>
+          </div>
+        </div>
+      </div>
+      <div id="secret_modal" class="modal-content" style="display: none;">
+        <div class="modal-header bg-success">
+          <h5 class="modal-title">Chat Channel Secret</h5>
+        </div>
+        <div class="modal-body">
+          <div class="md-form">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Secret</span>
+              </div>
+              <input id="secret" type="text" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-success">
+          <div id='login-trigger-container'>
+            <button type='button' class="btn btn-secondary" onclick='secret()'>Set</button>
+            <button type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
           </div>
         </div>
       </div>

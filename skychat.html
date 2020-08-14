@@ -72,20 +72,15 @@
                 }
                 var content = decrypt(comment.getElementsByTagName("content")[0].innerHTML);
                 if (content) {
-                    var encryptedMessageHTML = "";
-                    if (encryptedMessagesCount > 0) {
-                        encryptedMessageHTML = `<div class='row'><div class="col-12 px-2 py-2 border-top"><center>${encryptedMessagesCount} Encrypted Messages</center></div></div>`;
-                    }
                     var commentHtml = `<div id='comment_${i}' class='row'><div class='col-1 px-2 py-2 border-top'><center><img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/></center></div><div class='col-11 px-2 py-2 border-top'><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${content}</div></div>`;
-                    commentsHTML = commentHtml + encryptedMessageHTML + commentsHTML;
+                    commentsHTML = commentHtml + getEncryptedMessagesHTML(encryptedMessagesCount) + commentsHTML;
                     encryptedMessagesCount = 0;
                 } else {
                     encryptedMessagesCount++;
                 }
             }
             if (encryptedMessagesCount > 0) {
-                var encryptedMessageHTML = `<div class='row'><div class="col-12 px-2 py-2 border-top"><center>${encryptedMessagesCount} Encrypted Messages</center></div></div>`;
-                commentsHTML = encryptedMessageHTML + commentsHTML;
+                commentsHTML = getEncryptedMessagesHTML(encryptedMessagesCount) + commentsHTML;
             }
             var scrollComment = snsComments.length - 1 - (commentStep * (commentOffset - 1));
             var loadMore = "";
@@ -96,6 +91,12 @@
             if (commentOffset > 1 && scrollComment >=0) {
                 window.scrollTo(0,document.getElementById("comment_" + scrollComment).offsetTop);
             }
+        }
+        function getEncryptedMessagesHTML(count) {
+            if (count <= 0) {
+                return "";
+            }
+            return `<div class='row text-muted'><div class="col-12 px-2 py-2 border-top"><center>${count} Encrypted Messages</center></div></div>`;
         }
         function getHost() {
             return document.getElementById("skychat_host").innerHTML;

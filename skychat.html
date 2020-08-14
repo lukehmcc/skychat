@@ -51,6 +51,7 @@
         function loadComments() {
             var snsComments = document.getElementById("sns_comments").getElementsByTagName("sns_comment");
             
+            var encryptedMessagesCount = 0;
             var commentsHTML = "";
             for (var i = snsComments.length-1, min = i - (commentStep * commentOffset); i >= 0 && i > min; i--) {
                 var comment = snsComments[i];
@@ -69,9 +70,22 @@
                 } else {
                     contactImg = anonymousImg
                 }
-                var content = decrypt(comment.getElementsByTagName("content")[0].innerHTML, "<i>encrypted</i>");
-                var commentHtml = `<div id='comment_${i}' class='row'><div class='col-1 px-2 py-2 border-top'><center><img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/></center></div><div class='col-11 px-2 py-2 border-top'><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${content}</div></div>`;
-                commentsHTML = commentHtml + commentsHTML;
+                var content = decrypt(comment.getElementsByTagName("content")[0].innerHTML);
+                if (content) {
+                    var encryptedMessageHTML = "";
+                    if (encryptedMessagesCount > 0) {
+                        encryptedMessageHTML = `<div class='row'><div class="col-12 px-2 py-2 border-top"><center>${encryptedMessagesCount} Encrypted Messages</center></div></div>`;
+                    }
+                    var commentHtml = `<div id='comment_${i}' class='row'><div class='col-1 px-2 py-2 border-top'><center><img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/></center></div><div class='col-11 px-2 py-2 border-top'><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${content}</div></div>`;
+                    commentsHTML = commentHtml + encryptedMessageHTML + commentsHTML;
+                    encryptedMessagesCount = 0;
+                } else {
+                    encryptedMessagesCount++;
+                }
+            }
+            if (encryptedMessagesCount > 0) {
+                var encryptedMessageHTML = `<div class='row'><div class="col-12 px-2 py-2 border-top"><center>${encryptedMessagesCount} Encrypted Messages</center></div></div>`;
+                commentsHTML = encryptedMessageHTML + commentsHTML;
             }
             var scrollComment = snsComments.length - 1 - (commentStep * (commentOffset - 1));
             var loadMore = "";
@@ -357,7 +371,7 @@
               <div class="input-group-prepend">
                 <span class="input-group-text">Secret</span>
               </div>
-              <input id="secret" type="text" class="form-control">
+              <input id="secret" type="password" class="form-control">
             </div>
           </div>
         </div>

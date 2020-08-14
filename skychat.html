@@ -85,7 +85,8 @@
             var scrollComment = snsComments.length - 1 - (commentStep * (commentOffset - 1));
             var loadMore = "";
             if (scrollComment >= 20) {
-                loadMore = `<button type='button' class="btn btn-secondary" onclick='commentOffset++;loadComments();'>Load More...</button><br/><br/>`;
+                loadMore = `<div class='row text-muted'><div class="col-12 px-2 py-2 border-top"><center>Loading More Comments</center></div></div>`;
+                setTimeout(function(){autoLoadMoreComments();}, 1000);
             }
             document.getElementById("comments").innerHTML = loadMore + commentsHTML;
             if (commentOffset > 1 && scrollComment >=0) {
@@ -100,6 +101,19 @@
         }
         function getHost() {
             return document.getElementById("skychat_host").innerHTML;
+        }
+        function autoLoadMoreComments() {
+            console.log(window.pageYOffset)
+            if (window.pageYOffset != 0) {
+                setTimeout(function(){autoLoadMoreComments();}, 250);
+            } else if(sessionStorage.getItem("skychat_state") != "chat"){
+                setTimeout(function(){autoLoadMoreComments();}, 250);
+            } else if (document.getElementById("navbar-toggler").offsetHeight == document.getElementById("nav_about").offsetHeight) {
+                setTimeout(function(){autoLoadMoreComments();}, 250);
+            } else {
+                commentOffset++;
+                loadComments();
+            }
         }
         function refresh() {
             if(sessionStorage.getItem("skychat_state") == "chat"){

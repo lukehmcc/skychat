@@ -255,7 +255,7 @@
         }
         function portal() {
             sessionStorage.setItem(getHost() + "_state", "chat");
-            window.location.href = `http://${snsPortal}/${getHost()}?portal=${document.getElementById('portal').value}`;
+            window.location.href = [window.location.protocol, '//', document.getElementById('portal').value, window.location.pathname, '?secret=', getSecret()].join('');
         }
         function login() {
             document.getElementById('login-trigger-container').innerHTML 

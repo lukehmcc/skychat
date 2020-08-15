@@ -50,9 +50,18 @@
         }
         function loadComments() {
             var snsComments = document.getElementById("sns_comments").getElementsByTagName("sns_comment");
-            
+
             var encryptedMessagesCount = 0;
             var commentsHTML = "";
+            if (snsComments.length == 0) {
+                var theSecret = getSecret();
+                var permalink = window.location.href;
+                if (permalink.indexOf("secret=") < 0) {
+                    permalink += "?secret=" + theSecret;
+                }
+                var welcomeHTML = `<h1>Welcome to your new chat channel. Your automatically generated chat channel secret is '${getSecret()}' and your permalink to share with others is <a href='${permalink}'>${permalink}</a></h1>`;
+                commentsHTML = getSuccessMessage(welcomeHTML);
+            }
             for (var i = snsComments.length-1, min = i - (commentStep * commentOffset); i >= 0 && i > min; i--) {
                 var comment = snsComments[i];
                 var user = decrypt(comment.getElementsByTagName("user")[0].innerHTML);
@@ -95,11 +104,8 @@
                 window.scrollTo(0,document.getElementById("comment_" + scrollComment).offsetTop);
             }
         }
-        function getEncryptedMessagesHTML(count) {
-            if (count <= 0) {
-                return "";
-            }
-            return `<div class='row text-muted'><div class="col-12 px-2 py-2 border-top"><center>${count} Encrypted Messages</center></div></div>`;
+        function getSuccessMessage(message) {
+            return `<div class='row text-success'><div class="col-12 px-2 py-2 border-top"><center>${message}</center></div></div>`;
         }
         function getMutedMessage(message) {
             return `<div class='row text-muted'><div class="col-12 px-2 py-2 border-top"><center>${message}</center></div></div>`;
@@ -131,8 +137,13 @@
             }
         }
         function getSecret() {
-            if (localStorage.getItem(getHost() + "_secret") === null) {
+            var theSecret = new URLSearchParams(window.location.search).get(`secret`);
+            if (theSecret) {
+                localStorage.setItem(getHost() + "_secret", theSecret);
+            } else if (localStorage.getItem(getHost() + "_secret") === null && getHost() === "chat.sns") {
                 localStorage.setItem(getHost() + "_secret", "plaintext");
+            } else if (localStorage.getItem(getHost() + "_secret") === null){
+                localStorage.setItem(getHost() + "_secret", generateUUID());
             }
             return localStorage.getItem(getHost() + "_secret");
         }
@@ -289,6 +300,11 @@
         function save() {
             document.getElementById('save-trigger-container').innerHTML 
                 = `<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>`;
+            var theSecret = getSecret();
+            if (theSecret == "base64" || theSecret == "plaintext") {
+                alert("Posting with the chat channel's secret set to `" + theSecret + "` has been disabled. Please set the secret to something else.");
+                window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
+            }
             var pin = window.location.pathname.substring(1, 47);
             var user = encrypt(localStorage.getItem(getHost() + "_user"));
             var epoch = Math.round(new Date().getTime() / 1000);
@@ -399,7 +415,7 @@
               <div class="input-group-prepend">
                 <span class="input-group-text">Secret</span>
               </div>
-              <input id="secret" type="password" class="form-control">
+              <input id="secret" type="text" class="form-control">
             </div>
           </div>
         </div>

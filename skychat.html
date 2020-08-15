@@ -59,9 +59,7 @@
             var encryptedMessagesCount = 0;
             var commentsHTML = "";
             if (snsComments.length == 0 && localStorage.getItem(getHost() + "_user") !== null) {
-                var theSecret = getSecret();
-                var permalink = [window.location.protocol, '//', window.location.host, window.location.pathname, '?secret=', theSecret].join('');
-                var welcomeHTML = `<h1>Welcome to your new chat channel. Your automatically generated chat channel secret is '${getSecret()}' and your permalink to share with others is <a href='${permalink}'>${permalink}</a></h1>`;
+                var welcomeHTML = `<h2>Welcome to your new chat channel.</h2><div>Your automatically generated channel secret is '${getSecret()}. Click the <a href='#' onclick='clickToChangeSecret()'>Secret</a> menu option to change the current channel secret. Click the <a href='#' onclick='clickToPermalink()'>Permalink</a> menu option at any time to generate a sharable Skylink to your chat channel. This permalink will have the current channel secret embedded in it so that everyone can talk to eachother.</div>`;
                 commentsHTML = getSuccessMessage(welcomeHTML);
             }
             for (var i = snsComments.length-1, min = i - (commentStep * commentOffset); i >= 0 && i > min; i--) {
@@ -102,7 +100,7 @@
                 setTimeout(function(){autoLoadMoreComments();}, 1000);
             }
             document.getElementById("comments").innerHTML =  commentsHTML;
-            if (scrollComment >= 20 && commentOffset > 1 && scrollComment >=0) {
+            if (scrollComment >= 20 && commentOffset > 1 && scrollComment >=0 && document.getElementById("comment_" + scrollComment) != null) {
                 window.scrollTo(0,document.getElementById("comment_" + scrollComment).offsetTop);
             }
         }
@@ -181,8 +179,9 @@
             document.getElementById("login_modal").style.display = "block";
             document.getElementById("secret_modal").style.display = "none";
             document.getElementById("portal_modal").style.display = "none";
-            document.getElementById("new_chat_modal").style.display = "none";
             document.getElementById("comment_modal").style.display = "none";
+            document.getElementById("new_chat_modal").style.display = "none";
+            document.getElementById("permalink_modal").style.display = "none";
             $("#resultsModal").modal("show");
         }
         function clickToChangeSecret() {
@@ -190,8 +189,9 @@
             document.getElementById("login_modal").style.display = "none";
             document.getElementById("secret_modal").style.display = "block";
             document.getElementById("portal_modal").style.display = "none";
-            document.getElementById("new_chat_modal").style.display = "none";
             document.getElementById("comment_modal").style.display = "none";
+            document.getElementById("new_chat_modal").style.display = "none";
+            document.getElementById("permalink_modal").style.display = "none";
             document.getElementById('secret').value = getSecret();
             $("#resultsModal").modal("show");
         }
@@ -200,8 +200,9 @@
             document.getElementById("login_modal").style.display = "none";
             document.getElementById("secret_modal").style.display = "none";
             document.getElementById("portal_modal").style.display = "block";
-            document.getElementById("new_chat_modal").style.display = "none";
             document.getElementById("comment_modal").style.display = "none";
+            document.getElementById("new_chat_modal").style.display = "none";
+            document.getElementById("permalink_modal").style.display = "none";
             document.getElementById('portal').value = skynetPortal;
             $("#resultsModal").modal("show");
         }
@@ -210,8 +211,9 @@
             document.getElementById("login_modal").style.display = "none";
             document.getElementById("secret_modal").style.display = "none";
             document.getElementById("portal_modal").style.display = "none";
-            document.getElementById("new_chat_modal").style.display = "none";
             document.getElementById("comment_modal").style.display = "block";
+            document.getElementById("new_chat_modal").style.display = "none";
+            document.getElementById("permalink_modal").style.display = "none";
             $("#resultsModal").modal("show");
         }
         function newChat() {
@@ -219,8 +221,9 @@
             document.getElementById("login_modal").style.display = "none";
             document.getElementById("secret_modal").style.display = "none";
             document.getElementById("portal_modal").style.display = "none";
-            document.getElementById("new_chat_modal").style.display = "block";
             document.getElementById("comment_modal").style.display = "none";
+            document.getElementById("new_chat_modal").style.display = "block";
+            document.getElementById("permalink_modal").style.display = "none";
             $("#resultsModal").modal("show");
             var pin = window.location.pathname.substring(1, 47);
             fetch(`/${pin}/`)
@@ -243,6 +246,33 @@
                         })
                         .catch(error => {console.error('Error:', error)});
                 })
+        }
+        function clickToPermalink() {
+            sessionStorage.setItem(getHost() + "_state", "newChat");
+            document.getElementById("login_modal").style.display = "none";
+            document.getElementById("secret_modal").style.display = "none";
+            document.getElementById("portal_modal").style.display = "none";
+            document.getElementById("comment_modal").style.display = "none";
+            document.getElementById("new_chat_modal").style.display = "none";
+            document.getElementById("permalink_modal").style.display = "block";
+            document.getElementById("permalink").innerHTML = `<div class="spinner-border" role="status"><span class="sr-only">In Progress...</span></div>`;
+            $("#resultsModal").modal("show");
+            const pin = window.location.pathname.substring(1, 47);
+            const newPage = `<script>`
+                + `const host = "${getHost()}";`
+                + `const theSecret = "${getSecret()}";`
+                + `localStorage.setItem(host + "_secret", theSecret);`
+                + `window.location.pathname = "${window.location.pathname}";`
+                + `</` + `script>`;
+            const blob = new Blob([newPage],{ type: 'text/html' });
+            var formData = new FormData();
+            formData.append('file', blob);
+            fetch(`/skynet/skyfile/${generateUUID()}?filename=permalink.html`, {method: 'POST',body: formData})
+                .then(response => response.json())
+                .then(result => {
+                    document.getElementById("permalink").innerHTML = `<a href="/${result.skylink}/">${result.skylink}</a>`;
+                })
+                .catch(error => {console.error('Error:', error)});
         }
         function cancel() {
             sessionStorage.setItem(getHost() + "_state", "chat");
@@ -358,7 +388,10 @@
         <a class="nav-link text-dark" href="#" onclick="clickToChangePortal()">Portals</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link text-dark" href="#" onclick="newChat()">New</a>
+        <a class="nav-link text-dark" href="#" onclick="newChat()">New Chat</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-dark" href="#" onclick="clickToPermalink()">Permalink</a>
       </li>
       <li id="nav_about" class="nav-item">
         <a class="nav-link text-dark" href="https://github.com/geo-gs/skychat">About</a>
@@ -463,6 +496,23 @@
         </div>
         <div class="modal-footer bg-success">
           <div id='login-trigger-container'>
+            <button type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
+          </div>
+        </div>
+      </div>
+      <div id="permalink_modal" class="modal-content" style="display: none;">
+        <div class="modal-header bg-success">
+          <h5 class="modal-title">Creating New Permalink</h5>
+        </div>
+        <div class="modal-body">
+          <div class="md-form">
+            <div class="input-group mb-3 text-dark">Permalinks are sharable Skylinks to the chat channel that has the secret embedded in it.</div>
+            <div id="permalink" class="input-group mb-3 text-dark"></div>
+          </div>
+        </div>
+        <div class="modal-footer bg-success">
+          <div id='login-trigger-container'>
+            <button type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>OK</button>
             <button type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
           </div>
         </div>

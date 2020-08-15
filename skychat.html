@@ -16,36 +16,41 @@
         var anonymousImg = `data:image/png;base64,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`;
 
         window.onload = function() {
-            if (sessionStorage.getItem(getHost() + "_state") === null) {
-                sessionStorage.setItem(getHost() + "_state", "chat");
-            }
-            loadComments();
-            var json = JSON.parse(new URLSearchParams(window.location.search).get(`json`));
-            if (json !== null && json.message !== null && json.message.length > 0) {
-              alert(json.message);
-            }
-            window.scrollTo(0,document.body.scrollHeight);
-            setTimeout(function(){refresh();}, 6000);
-            if (sessionStorage.getItem(getHost() + "_state") == "compose") {
-                clickToComment();
-            } else if (sessionStorage.getItem(getHost() + "_state") == "login") {
-                clickToLogin();
-            } else if (sessionStorage.getItem(getHost() + "_state") == "portal") {
-                clickToChangePortal();
-            }
-            if (localStorage.getItem(getHost() + "_user") === null) {
-                clickToLogin();
-            }
-            if (localStorage.getItem(getHost() + "_contact") !== null) {
-                var contact = localStorage.getItem(getHost() + "_contact");
-                var contactImg = "";
-                var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
-                if (pinRegex.test(contact)) {
-                    contactImg = `/${contact}/`;
-                } else {
-                    contactImg = anonymousImg
+            if (new URLSearchParams(window.location.search).get(`secret`) !== null) {
+                getSecret(); //sets the secret into localStorage
+                window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
+            } else {
+                if (sessionStorage.getItem(getHost() + "_state") === null) {
+                    sessionStorage.setItem(getHost() + "_state", "chat");
                 }
-                document.getElementById("comment_modal_avatar").innerHTML = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/> ${localStorage.getItem(getHost() + "_user")}`;
+                loadComments();
+                var json = JSON.parse(new URLSearchParams(window.location.search).get(`json`));
+                if (json !== null && json.message !== null && json.message.length > 0) {
+                    alert(json.message);
+                }
+                window.scrollTo(0,document.body.scrollHeight);
+                setTimeout(function(){refresh();}, 6000);
+                if (sessionStorage.getItem(getHost() + "_state") == "compose") {
+                    clickToComment();
+                } else if (sessionStorage.getItem(getHost() + "_state") == "login") {
+                    clickToLogin();
+                } else if (sessionStorage.getItem(getHost() + "_state") == "portal") {
+                    clickToChangePortal();
+                }
+                if (localStorage.getItem(getHost() + "_user") === null) {
+                    clickToLogin();
+                }
+                if (localStorage.getItem(getHost() + "_contact") !== null) {
+                    var contact = localStorage.getItem(getHost() + "_contact");
+                    var contactImg = "";
+                    var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
+                    if (pinRegex.test(contact)) {
+                        contactImg = `/${contact}/`;
+                    } else {
+                        contactImg = anonymousImg
+                    }
+                    document.getElementById("comment_modal_avatar").innerHTML = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/> ${localStorage.getItem(getHost() + "_user")}`;
+                }
             }
         }
         function loadComments() {
@@ -53,12 +58,9 @@
 
             var encryptedMessagesCount = 0;
             var commentsHTML = "";
-            if (snsComments.length == 0) {
+            if (snsComments.length == 0 && localStorage.getItem(getHost() + "_user") !== null) {
                 var theSecret = getSecret();
-                var permalink = window.location.href;
-                if (permalink.indexOf("secret=") < 0) {
-                    permalink += "?secret=" + theSecret;
-                }
+                var permalink = [window.location.protocol, '//', window.location.host, window.location.pathname, '?secret=', theSecret].join('');
                 var welcomeHTML = `<h1>Welcome to your new chat channel. Your automatically generated chat channel secret is '${getSecret()}' and your permalink to share with others is <a href='${permalink}'>${permalink}</a></h1>`;
                 commentsHTML = getSuccessMessage(welcomeHTML);
             }
@@ -190,6 +192,7 @@
             document.getElementById("portal_modal").style.display = "none";
             document.getElementById("new_chat_modal").style.display = "none";
             document.getElementById("comment_modal").style.display = "none";
+            document.getElementById('secret').value = getSecret();
             $("#resultsModal").modal("show");
         }
         function clickToChangePortal() {

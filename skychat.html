@@ -59,7 +59,7 @@
             var encryptedMessagesCount = 0;
             var commentsHTML = "";
             if (snsComments.length == 0 && localStorage.getItem(getHost() + "_user") !== null) {
-                var welcomeHTML = `<h2>Welcome to your new chat channel.</h2><div>Your automatically generated channel secret is '${getSecret()}. Click the <a href='#' onclick='clickToChangeSecret()'>Secret</a> menu option to change the current channel secret. Click the <a href='#' onclick='clickToPermalink()'>Permalink</a> menu option at any time to generate a sharable Skylink to your chat channel. This permalink will have the current channel secret embedded in it so that everyone can talk to eachother.</div>`;
+                var welcomeHTML = `<h2>Welcome to your new chat channel.</h2><div>Your channel secret is currently set to "${getSecret()}". Click the <a href='#' onclick='clickToChangeSecret()'>Secret</a> menu option to change the current channel secret. Click the <a href='#' onclick='clickToPermalink()'>Permalink</a> menu option at any time to generate a sharable Skylink to your chat channel. This permalink will have the current channel secret embedded in it so that everyone can talk to eachother.</div>`;
                 commentsHTML = getSuccessMessage(welcomeHTML);
             }
             for (var i = snsComments.length-1, min = i - (commentStep * commentOffset); i >= 0 && i > min; i--) {

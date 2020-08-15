@@ -2,7 +2,7 @@
 
 ## Public Example
 
-https://skyportal.xyz/JACXfMpnh87gTErUh8WiW5UIXSeGx7MpYbM6hAQzppH2_A/?secret=freedom
+https://skyportal.xyz/JACh2caIHMGGprne-DdpFNk7jQAGgamU08tYiN4jrtvEtw/?secret=freedom
 
 ## About
 

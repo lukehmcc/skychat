@@ -91,7 +91,7 @@
                 setTimeout(function(){autoLoadMoreComments();}, 1000);
             }
             document.getElementById("comments").innerHTML =  commentsHTML;
-            if (commentOffset > 1 && scrollComment >=0) {
+            if (scrollComment >= 20 && commentOffset > 1 && scrollComment >=0) {
                 window.scrollTo(0,document.getElementById("comment_" + scrollComment).offsetTop);
             }
         }
@@ -169,6 +169,7 @@
             document.getElementById("login_modal").style.display = "block";
             document.getElementById("secret_modal").style.display = "none";
             document.getElementById("portal_modal").style.display = "none";
+            document.getElementById("new_chat_modal").style.display = "none";
             document.getElementById("comment_modal").style.display = "none";
             $("#resultsModal").modal("show");
         }
@@ -177,8 +178,8 @@
             document.getElementById("login_modal").style.display = "none";
             document.getElementById("secret_modal").style.display = "block";
             document.getElementById("portal_modal").style.display = "none";
+            document.getElementById("new_chat_modal").style.display = "none";
             document.getElementById("comment_modal").style.display = "none";
-            document.getElementById('portal').value = skynetPortal;
             $("#resultsModal").modal("show");
         }
         function clickToChangePortal() {
@@ -186,6 +187,7 @@
             document.getElementById("login_modal").style.display = "none";
             document.getElementById("secret_modal").style.display = "none";
             document.getElementById("portal_modal").style.display = "block";
+            document.getElementById("new_chat_modal").style.display = "none";
             document.getElementById("comment_modal").style.display = "none";
             document.getElementById('portal').value = skynetPortal;
             $("#resultsModal").modal("show");
@@ -195,8 +197,39 @@
             document.getElementById("login_modal").style.display = "none";
             document.getElementById("secret_modal").style.display = "none";
             document.getElementById("portal_modal").style.display = "none";
+            document.getElementById("new_chat_modal").style.display = "none";
             document.getElementById("comment_modal").style.display = "block";
             $("#resultsModal").modal("show");
+        }
+        function newChat() {
+            sessionStorage.setItem(getHost() + "_state", "newChat");
+            document.getElementById("login_modal").style.display = "none";
+            document.getElementById("secret_modal").style.display = "none";
+            document.getElementById("portal_modal").style.display = "none";
+            document.getElementById("new_chat_modal").style.display = "block";
+            document.getElementById("comment_modal").style.display = "none";
+            $("#resultsModal").modal("show");
+            var pin = window.location.pathname.substring(1, 47);
+            fetch(`/${pin}/`)
+                .then(response => response.text())
+                .then(result => {
+                    var host = `${generateUUID()}.sns`;
+                    var skychatDiv = `<skychat id="skychat_host" style="display: none">`;
+                    var endingIndex = result.lastIndexOf(skychatDiv);
+                    var newPage = result.substring(0, endingIndex) 
+                    + `${skychatDiv}${host}</skychat><sns_comments id="sns_comments" style="display: none"></sns_comments></body>`;
+                    var blob = new Blob([newPage],{ type: 'text/html' });
+                    var formData = new FormData();
+                    formData.append('file', blob);
+                    const uuid = generateUUID();
+                    fetch(`/skynet/skyfile/${uuid}?filename=comment.html`, {method: 'POST',body: formData})
+                        .then(response => response.json())
+                        .then(result => {
+                            sessionStorage.setItem(getHost() + "_state", "chat");
+                            window.location.href = `http://${snsPortal}/register?host=${host}&pin=${result.skylink}&password=${generateUUID()}&redirect=${result.skylink}&portal=${skynetPortal}`;
+                        })
+                        .catch(error => {console.error('Error:', error)});
+                })
         }
         function cancel() {
             sessionStorage.setItem(getHost() + "_state", "chat");
@@ -283,30 +316,6 @@
                         .then(result => {
                             sessionStorage.setItem(getHost() + "_state", "chat");
                             window.location.href = `http://${snsPortal}/comment?host=${getHost()}&pin=${result.skylink}&user=${encodeURIComponent(user)}&epoch=${epoch}&contact=${encodeURIComponent(contact)}&content=${encodeURIComponent(content)}&redirect=${result.skylink}&portal=${skynetPortal}`;
-                        })
-                        .catch(error => {console.error('Error:', error)});
-                })
-        }
-        function newChat() {
-            sessionStorage.setItem(getHost() + "_state", "newChat");
-            var pin = window.location.pathname.substring(1, 47);
-            fetch(`/${pin}/`)
-                .then(response => response.text())
-                .then(result => {
-                    var host = `${generateUUID()}.sns`;
-                    var skychatDiv = `<skychat id="skychat_host" style="display: none">`;
-                    var endingIndex = result.lastIndexOf(skychatDiv);
-                    var newPage = result.substring(0, endingIndex) 
-                    + `${skychatDiv}${host}</skychat><sns_comments id="sns_comments" style="display: none"></sns_comments></body>`;
-                    var blob = new Blob([newPage],{ type: 'text/html' });
-                    var formData = new FormData();
-                    formData.append('file', blob);
-                    const uuid = generateUUID();
-                    fetch(`/skynet/skyfile/${uuid}?filename=comment.html`, {method: 'POST',body: formData})
-                        .then(response => response.json())
-                        .then(result => {
-                            sessionStorage.setItem(getHost() + "_state", "chat");
-                            window.location.href = `http://${snsPortal}/register?host=${host}&pin=${result.skylink}&password=${generateUUID()}&redirect=${result.skylink}&portal=${skynetPortal}`;
                         })
                         .catch(error => {console.error('Error:', error)});
                 })
@@ -419,6 +428,23 @@
         <div class="modal-footer bg-success">
           <div id='login-trigger-container'>
             <button type='button' class="btn btn-secondary" onclick='portal()'>Change</button>
+            <button type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
+          </div>
+        </div>
+      </div>
+      <div id="new_chat_modal" class="modal-content" style="display: none;">
+        <div class="modal-header bg-success">
+          <h5 class="modal-title">Creating New Chat Channel</h5>
+        </div>
+        <div class="modal-body">
+          <div class="md-form">
+            <div class="input-group mb-3 text-dark">
+              <div class="spinner-border" role="status"><span class="sr-only">In Progress...</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-success">
+          <div id='login-trigger-container'>
             <button type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
           </div>
         </div>

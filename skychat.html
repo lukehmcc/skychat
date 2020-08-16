@@ -10,7 +10,6 @@
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.0.0/crypto-js.min.js" integrity="sha384-0GjPiy2OWGZr3mGFrBPHGVu/8A+YHOeDXUFWv6NDA2nO6eVq9UoFnzUSy1bVv8FE" crossorigin="anonymous"></script>
     <script>
         var snsPortal = `sns.redirectme.net`;
-        var skynetPortal = window.location.hostname;
         var commentStep = 20;
         var commentOffset = 1;
         var anonymousImg = `data:image/png;base64,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`;
@@ -18,10 +17,10 @@
         window.onload = function() {
             if (new URLSearchParams(window.location.search).get(`secret`) !== null) {
                 getSecret(); //sets the secret into localStorage
-                window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
+                window.location.href = `http://${snsPortal}/${getHost()}?portal=${getSkynetPortal()}`;
             } else {
-                if (sessionStorage.getItem(getHost() + "_state") === null) {
-                    sessionStorage.setItem(getHost() + "_state", "chat");
+                if (getState() === null) {
+                    resetState();
                 }
                 loadComments();
                 var json = JSON.parse(new URLSearchParams(window.location.search).get(`json`));
@@ -30,22 +29,22 @@
                 }
                 window.scrollTo(0,document.body.scrollHeight);
                 setTimeout(function(){refresh();}, 6000);
-                if (sessionStorage.getItem(getHost() + "_state") == "compose_modal") {
+                if (getState() == "compose_modal") {
                     clickToCompose();
-                } else if (sessionStorage.getItem(getHost() + "_state") == "login_modal") {
+                } else if (getState() == "login_modal") {
                     clickToLogin();
-                } else if (sessionStorage.getItem(getHost() + "_state") == "portal_modal") {
+                } else if (getState() == "portal_modal") {
                     clickToChangePortal();
-                } else if (sessionStorage.getItem(getHost() + "_state") == "new_chat_modal") {
+                } else if (getState() == "new_chat_modal") {
                     newChat();
-                } else if (sessionStorage.getItem(getHost() + "_state") == "permalink_modal") {
+                } else if (getState() == "permalink_modal") {
                     clickToPermalink();
                 }
-                if (localStorage.getItem(getHost() + "_user") === null) {
+                if (getUser() === null) {
                     clickToLogin();
                 }
-                if (localStorage.getItem(getHost() + "_contact") !== null) {
-                    var contact = localStorage.getItem(getHost() + "_contact");
+                if (getContact() !== null) {
+                    var contact = getContact();
                     var contactImg = "";
                     var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
                     if (pinRegex.test(contact)) {
@@ -53,7 +52,7 @@
                     } else {
                         contactImg = anonymousImg
                     }
-                    document.getElementById("compose_modal_avatar").innerHTML = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/> ${localStorage.getItem(getHost() + "_user")}`;
+                    document.getElementById("compose_modal_avatar").innerHTML = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/> ${getUser()}`;
                 }
             }
         }
@@ -62,7 +61,7 @@
 
             var encryptedMessagesCount = 0;
             var commentsHTML = "";
-            if (snsComments.length == 0 && localStorage.getItem(getHost() + "_user") !== null) {
+            if (snsComments.length == 0 && getUser() !== null) {
                 var welcomeHTML = `<h2>Welcome to your new chat channel.</h2><div>Your channel secret is currently set to "${getSecret()}". Click the <a href='#' onclick='clickToChangeSecret()'>Secret</a> menu option to change the current channel secret. Click the <a href='#' onclick='clickToPermalink()'>Permalink</a> menu option at any time to generate a sharable Skylink to your chat channel. This permalink will have the current channel secret embedded in it so that everyone can talk to eachother.</div>`;
                 commentsHTML = getSuccessComment(welcomeHTML);
             }
@@ -118,43 +117,6 @@
         function getComment(i, user, epoch, image, message) {
             return `<div id='comment_${i}' class='row'><div class='col-1 px-2 py-2 border-top'><center><img class='rounded-circle' width='50px' height='50px' src='${image}'/></center></div><div class='col-11 px-2 py-2 border-top'><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${message}</div></div>`;
         }
-        function getHost() {
-            return document.getElementById("skychat_host").innerHTML;
-        }
-        function autoLoadMoreComments() {
-            if (window.pageYOffset != 0) {
-                setTimeout(function(){autoLoadMoreComments();}, 250);
-            } else if(sessionStorage.getItem(getHost() + "_state") != "chat"){
-                setTimeout(function(){autoLoadMoreComments();}, 250);
-            } else if (document.getElementById("navbar-toggler").offsetHeight == document.getElementById("nav_about").offsetHeight) {
-                setTimeout(function(){autoLoadMoreComments();}, 250);
-            } else {
-                commentOffset++;
-                loadComments();
-            }
-        }
-        function refresh() {
-            if(sessionStorage.getItem(getHost() + "_state") == "chat"){
-                if ((window.innerHeight + Math.ceil(window.pageYOffset + 1)) < document.body.offsetHeight) {
-                    setTimeout(function(){refresh();}, 250);
-                } else if (document.getElementById("navbar-toggler").offsetHeight == document.getElementById("nav_about").offsetHeight) {
-                    setTimeout(function(){refresh();}, 250);
-                } else {
-                    window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
-                }
-            }
-        }
-        function getSecret() {
-            var theSecret = new URLSearchParams(window.location.search).get(`secret`);
-            if (theSecret) {
-                localStorage.setItem(getHost() + "_secret", theSecret);
-            } else if (localStorage.getItem(getHost() + "_secret") === null && getHost() === "chat.sns") {
-                localStorage.setItem(getHost() + "_secret", "plaintext");
-            } else if (localStorage.getItem(getHost() + "_secret") === null){
-                localStorage.setItem(getHost() + "_secret", generateUUID());
-            }
-            return localStorage.getItem(getHost() + "_secret");
-        }
         function stripXSS(data) {
             return data.replace(/</g,"&lt;").replace(/>/g,"&gt;");
         }
@@ -174,6 +136,29 @@
                 return opt;
             }
         }
+        function autoLoadMoreComments() {
+            if (window.pageYOffset != 0) {
+                setTimeout(function(){autoLoadMoreComments();}, 250);
+            } else if(getState() != "chat"){
+                setTimeout(function(){autoLoadMoreComments();}, 250);
+            } else if (document.getElementById("navbar-toggler").offsetHeight == document.getElementById("nav_about").offsetHeight) {
+                setTimeout(function(){autoLoadMoreComments();}, 250);
+            } else {
+                commentOffset++;
+                loadComments();
+            }
+        }
+        function refresh() {
+            if(getState() == "chat"){
+                if ((window.innerHeight + Math.ceil(window.pageYOffset + 1)) < document.body.offsetHeight) {
+                    setTimeout(function(){refresh();}, 250);
+                } else if (document.getElementById("navbar-toggler").offsetHeight == document.getElementById("nav_about").offsetHeight) {
+                    setTimeout(function(){refresh();}, 250);
+                } else {
+                    window.location.href = `http://${snsPortal}/${getHost()}?portal=${getSkynetPortal()}`;
+                }
+            }
+        }
         function generateUUID() {
             let uuid = '';
             const cs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -183,7 +168,7 @@
             return uuid;
         }
         function showModal(selection) {
-            sessionStorage.setItem(getHost() + "_state", selection);
+            setState(selection);
             const modalIds = ["login_modal", "secret_modal", "portal_modal", "compose_modal", "new_chat_modal", "permalink_modal"];
             modalIds.forEach(modalId => {
                 var modalDisplay = modalId === selection ? "block" : "none";
@@ -200,7 +185,7 @@
         }
         function clickToChangePortal() {
             showModal("portal_modal");
-            document.getElementById('portal').value = skynetPortal;
+            document.getElementById('portal').value = getSkynetPortal();
         }
         function clickToCompose() {
             showModal("compose_modal");
@@ -223,8 +208,8 @@
                     fetch(`/skynet/skyfile/${uuid}?filename=comment.html`, {method: 'POST',body: formData})
                         .then(response => response.json())
                         .then(result => {
-                            sessionStorage.setItem(getHost() + "_state", "chat");
-                            window.location.href = `http://${snsPortal}/register?host=${host}&pin=${result.skylink}&password=${generateUUID()}&redirect=${result.skylink}&portal=${skynetPortal}`;
+                            resetState();
+                            window.location.href = `http://${snsPortal}/register?host=${host}&pin=${result.skylink}&password=${generateUUID()}&redirect=${result.skylink}&portal=${getSkynetPortal()}`;
                         })
                         .catch(error => {console.error('Error:', error)});
                 })
@@ -248,23 +233,23 @@
                 .catch(error => {console.error('Error:', error)});
         }
         function cancel() {
-            sessionStorage.setItem(getHost() + "_state", "chat");
-            window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
+            resetState();
+            window.location.href = `http://${snsPortal}/${getHost()}?portal=${getSkynetPortal()}`;
         }
         function secret() {
-            sessionStorage.setItem(getHost() + "_state", "chat");
-            localStorage.setItem(getHost() + "_secret", document.getElementById('secret').value);
-            window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
+            resetState();
+            setSecret(document.getElementById('secret').value);
+            window.location.href = `http://${snsPortal}/${getHost()}?portal=${getSkynetPortal()}`;
         }
         function portal() {
-            sessionStorage.setItem(getHost() + "_state", "chat");
+            resetState();
             window.location.href = [window.location.protocol, '//', document.getElementById('portal').value, window.location.pathname, '?secret=', getSecret()].join('');
         }
         function login() {
             document.getElementById('login-trigger-container').innerHTML 
                 = `<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>`;
-            localStorage.setItem(getHost() + "_user", document.getElementById("user").value);
-            localStorage.setItem(getHost() + "_contact", "");
+            setUser(document.getElementById("user").value);
+            setContact("");
             var file = document.getElementById('contact').files[0];
             if (file != null) {
                 $.ajax({
@@ -277,31 +262,31 @@
                     processData: false,
                     dataType: 'json',
                     success: function (data, textStatus, jqXHR) {
-                        localStorage.setItem(getHost() + "_contact", data.skylink);
-                        sessionStorage.setItem(getHost() + "_state", "chat");
-                        window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
+                        setContact(data.skylink);
+                        resetState();
+                        window.location.href = `http://${snsPortal}/${getHost()}?portal=${getSkynetPortal()}`;
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        sessionStorage.setItem(getHost() + "_state", "chat");
-                        window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
+                        resetState();
+                        window.location.href = `http://${snsPortal}/${getHost()}?portal=${getSkynetPortal()}`;
                     }
                 });
             } else {
-                sessionStorage.setItem(getHost() + "_state", "chat");
-                window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
+                resetState();
+                window.location.href = `http://${snsPortal}/${getHost()}?portal=${getSkynetPortal()}`;
             }
         }
         function anonomous_login() {
-            localStorage.setItem(getHost() + "_user", "Anonomous");
-            localStorage.setItem(getHost() + "_contact", "");
-            sessionStorage.setItem(getHost() + "_state", "chat");
-            window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
+            setUser("Anonomous");
+            setContact("");
+            resetState();
+            window.location.href = `http://${snsPortal}/${getHost()}?portal=${getSkynetPortal()}`;
         }
         function logout() {
-            localStorage.removeItem(getHost() + "_user");
-            localStorage.removeItem(getHost() + "_contact");
+            resetUser();
+            resetContact();
             document.getElementById("compose_modal_avatar").innerHTML = "";
-            window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
+            window.location.href = `http://${snsPortal}/${getHost()}?portal=${getSkynetPortal()}`;
         }
         function save() {
             document.getElementById('save-trigger-container').innerHTML 
@@ -309,12 +294,12 @@
             var theSecret = getSecret();
             if (theSecret == "base64" || theSecret == "plaintext") {
                 alert("Posting with the chat channel's secret set to `" + theSecret + "` has been disabled. Please set the secret to something else.");
-                window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
+                window.location.href = `http://${snsPortal}/${getHost()}?portal=${getSkynetPortal()}`;
             }
             var pin = window.location.pathname.substring(1, 47);
-            var user = encrypt(localStorage.getItem(getHost() + "_user"));
+            var user = encrypt(getUser());
             var epoch = Math.round(new Date().getTime() / 1000);
-            var contact = encrypt(localStorage.getItem(getHost() + "_contact"));
+            var contact = encrypt(getContact());
             var content = encrypt(document.getElementById("content").value);
             var snsComment = `<sns_comment>`
                 + `<pin>${pin}</pin>`
@@ -335,11 +320,58 @@
                     fetch(`/skynet/skyfile/${uuid}?filename=comment.html`, {method: 'POST',body: formData})
                         .then(response => response.json())
                         .then(result => {
-                            sessionStorage.setItem(getHost() + "_state", "chat");
-                            window.location.href = `http://${snsPortal}/comment?host=${getHost()}&pin=${result.skylink}&user=${encodeURIComponent(user)}&epoch=${epoch}&contact=${encodeURIComponent(contact)}&content=${encodeURIComponent(content)}&redirect=${result.skylink}&portal=${skynetPortal}`;
+                            resetState();
+                            window.location.href = `http://${snsPortal}/comment?host=${getHost()}&pin=${result.skylink}&user=${encodeURIComponent(user)}&epoch=${epoch}&contact=${encodeURIComponent(contact)}&content=${encodeURIComponent(content)}&redirect=${result.skylink}&portal=${getSkynetPortal()}`;
                         })
                         .catch(error => {console.error('Error:', error)});
                 })
+        }
+        function getHost() {
+            return document.getElementById("skychat_host").innerHTML;
+        }
+        function getSecret() {
+            var theSecret = new URLSearchParams(window.location.search).get(`secret`);
+            if (theSecret) {
+                localStorage.setItem(getHost() + "_secret", theSecret);
+            } else if (localStorage.getItem(getHost() + "_secret") === null && getHost() === "chat.sns") {
+                localStorage.setItem(getHost() + "_secret", "plaintext");
+            } else if (localStorage.getItem(getHost() + "_secret") === null){
+                localStorage.setItem(getHost() + "_secret", generateUUID());
+            }
+            return localStorage.getItem(getHost() + "_secret");
+        }
+        function setSecret(secret) {
+            localStorage.setItem(getHost() + "_secret", secret);
+        }
+        function getState() {
+            return sessionStorage.getItem(getHost() + "_state");
+        }
+        function setState(state) {
+            sessionStorage.setItem(getHost() + "_state", state);
+        }
+        function resetState() {
+            setState("chat");
+        }
+        function getUser() {
+            return localStorage.getItem(getHost() + "_user");
+        }
+        function setUser(user) {
+            localStorage.setItem(getHost() + "_user", user);
+        }
+        function resetUser() {
+            localStorage.removeItem(getHost() + "_user");
+        }
+        function getContact() {
+            return localStorage.getItem(getHost() + "_contact");
+        }
+        function setContact(contact) {
+            localStorage.setItem(getHost() + "_contact", contact);
+        }
+        function resetContact() {
+            localStorage.removeItem(getHost() + "_contact");
+        }
+        function getSkynetPortal() {
+            return window.location.hostname;
         }
     </script>
 </head>

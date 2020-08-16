@@ -31,11 +31,15 @@
                 window.scrollTo(0,document.body.scrollHeight);
                 setTimeout(function(){refresh();}, 6000);
                 if (sessionStorage.getItem(getHost() + "_state") == "compose_modal") {
-                    clickToComment();
+                    clickToCompose();
                 } else if (sessionStorage.getItem(getHost() + "_state") == "login_modal") {
                     clickToLogin();
                 } else if (sessionStorage.getItem(getHost() + "_state") == "portal_modal") {
                     clickToChangePortal();
+                } else if (sessionStorage.getItem(getHost() + "_state") == "new_chat_modal") {
+                    newChat();
+                } else if (sessionStorage.getItem(getHost() + "_state") == "permalink_modal") {
+                    clickToPermalink();
                 }
                 if (localStorage.getItem(getHost() + "_user") === null) {
                     clickToLogin();
@@ -49,7 +53,7 @@
                     } else {
                         contactImg = anonymousImg
                     }
-                    document.getElementById("comment_modal_avatar").innerHTML = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/> ${localStorage.getItem(getHost() + "_user")}`;
+                    document.getElementById("compose_modal_avatar").innerHTML = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/> ${localStorage.getItem(getHost() + "_user")}`;
                 }
             }
         }
@@ -180,7 +184,7 @@
         }
         function showModal(selection) {
             sessionStorage.setItem(getHost() + "_state", selection);
-            const modalIds = ["login_modal", "secret_modal", "portal_modal", "comment_modal", "compose_modal", "permalink_modal"];
+            const modalIds = ["login_modal", "secret_modal", "portal_modal", "compose_modal", "new_chat_modal", "permalink_modal"];
             modalIds.forEach(modalId => {
                 var modalDisplay = modalId === selection ? "block" : "none";
                 document.getElementById(modalId).style.display = modalDisplay;
@@ -198,11 +202,11 @@
             showModal("portal_modal");
             document.getElementById('portal').value = skynetPortal;
         }
-        function clickToComment() {
-            showModal("comment_modal");
+        function clickToCompose() {
+            showModal("compose_modal");
         }
         function newChat() {
-            showModal("compose_modal");
+            showModal("new_chat_modal");
             const pin = window.location.pathname.substring(1, 47);
             fetch(`/${pin}/`)
                 .then(response => response.text())
@@ -296,7 +300,7 @@
         function logout() {
             localStorage.removeItem(getHost() + "_user");
             localStorage.removeItem(getHost() + "_contact");
-            document.getElementById("comment_modal_avatar").innerHTML = "";
+            document.getElementById("compose_modal_avatar").innerHTML = "";
             window.location.href = `http://${snsPortal}/${getHost()}?portal=${skynetPortal}`;
         }
         function save() {
@@ -452,7 +456,7 @@
           </div>
         </div>
       </div>
-      <div id="compose_modal" class="modal-content" style="display: none;">
+      <div id="new_chat_modal" class="modal-content" style="display: none;">
         <div class="modal-header bg-success">
           <h5 class="modal-title">Creating New Chat Channel</h5>
         </div>
@@ -486,9 +490,9 @@
           </div>
         </div>
       </div>
-      <div id="comment_modal" class="modal-content" style="display: none;">
+      <div id="compose_modal" class="modal-content" style="display: none;">
         <div class="modal-header bg-success">
-          <h5 id="comment_modal_avatar" class="modal-title"></h5>
+          <h5 id="compose_modal_avatar" class="modal-title"></h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick='cancel()'>
             <span aria-hidden="true">&times;</span>
           </button>
@@ -517,7 +521,7 @@
     <div class="input-group-prepend">
       <span class="input-group-text">✎</span>
     </div>
-    <input type="text" class="form-control" placeholder="Message group..." onclick='clickToComment();$("#resultsModal").modal("show")'>
+    <input type="text" class="form-control" placeholder="Message group..." onclick='clickToCompose();$("#resultsModal").modal("show")'>
   </div>
 </nav>
 

@@ -30,11 +30,11 @@
                 }
                 window.scrollTo(0,document.body.scrollHeight);
                 setTimeout(function(){refresh();}, 6000);
-                if (sessionStorage.getItem(getHost() + "_state") == "compose") {
+                if (sessionStorage.getItem(getHost() + "_state") == "compose_modal") {
                     clickToComment();
-                } else if (sessionStorage.getItem(getHost() + "_state") == "login") {
+                } else if (sessionStorage.getItem(getHost() + "_state") == "login_modal") {
                     clickToLogin();
-                } else if (sessionStorage.getItem(getHost() + "_state") == "portal") {
+                } else if (sessionStorage.getItem(getHost() + "_state") == "portal_modal") {
                     clickToChangePortal();
                 }
                 if (localStorage.getItem(getHost() + "_user") === null) {
@@ -178,67 +178,41 @@
             };
             return uuid;
         }
-        function clickToLogin() {
-            sessionStorage.setItem(getHost() + "_state", "login");
-            document.getElementById("login_modal").style.display = "block";
-            document.getElementById("secret_modal").style.display = "none";
-            document.getElementById("portal_modal").style.display = "none";
-            document.getElementById("comment_modal").style.display = "none";
-            document.getElementById("new_chat_modal").style.display = "none";
-            document.getElementById("permalink_modal").style.display = "none";
+        function showModal(selection) {
+            sessionStorage.setItem(getHost() + "_state", selection);
+            const modalIds = ["login_modal", "secret_modal", "portal_modal", "comment_modal", "compose_modal", "permalink_modal"];
+            modalIds.forEach(modalId => {
+                var modalDisplay = modalId === selection ? "block" : "none";
+                document.getElementById(modalId).style.display = modalDisplay;
+            });
             $("#resultsModal").modal("show");
+        }
+        function clickToLogin() {
+            showModal("login_modal");
         }
         function clickToChangeSecret() {
-            sessionStorage.setItem(getHost() + "_state", "secret");
-            document.getElementById("login_modal").style.display = "none";
-            document.getElementById("secret_modal").style.display = "block";
-            document.getElementById("portal_modal").style.display = "none";
-            document.getElementById("comment_modal").style.display = "none";
-            document.getElementById("new_chat_modal").style.display = "none";
-            document.getElementById("permalink_modal").style.display = "none";
+            showModal("secret_modal");
             document.getElementById('secret').value = getSecret();
-            $("#resultsModal").modal("show");
         }
         function clickToChangePortal() {
-            sessionStorage.setItem(getHost() + "_state", "portal");
-            document.getElementById("login_modal").style.display = "none";
-            document.getElementById("secret_modal").style.display = "none";
-            document.getElementById("portal_modal").style.display = "block";
-            document.getElementById("comment_modal").style.display = "none";
-            document.getElementById("new_chat_modal").style.display = "none";
-            document.getElementById("permalink_modal").style.display = "none";
+            showModal("portal_modal");
             document.getElementById('portal').value = skynetPortal;
-            $("#resultsModal").modal("show");
         }
         function clickToComment() {
-            sessionStorage.setItem(getHost() + "_state", "compose");
-            document.getElementById("login_modal").style.display = "none";
-            document.getElementById("secret_modal").style.display = "none";
-            document.getElementById("portal_modal").style.display = "none";
-            document.getElementById("comment_modal").style.display = "block";
-            document.getElementById("new_chat_modal").style.display = "none";
-            document.getElementById("permalink_modal").style.display = "none";
-            $("#resultsModal").modal("show");
+            showModal("comment_modal");
         }
         function newChat() {
-            sessionStorage.setItem(getHost() + "_state", "newChat");
-            document.getElementById("login_modal").style.display = "none";
-            document.getElementById("secret_modal").style.display = "none";
-            document.getElementById("portal_modal").style.display = "none";
-            document.getElementById("comment_modal").style.display = "none";
-            document.getElementById("new_chat_modal").style.display = "block";
-            document.getElementById("permalink_modal").style.display = "none";
-            $("#resultsModal").modal("show");
-            var pin = window.location.pathname.substring(1, 47);
+            showModal("compose_modal");
+            const pin = window.location.pathname.substring(1, 47);
             fetch(`/${pin}/`)
                 .then(response => response.text())
                 .then(result => {
-                    var host = `${generateUUID()}.sns`;
-                    var skychatDiv = `<skychat id="skychat_host" style="display: none">`;
-                    var endingIndex = result.lastIndexOf(skychatDiv);
-                    var newPage = result.substring(0, endingIndex) 
+                    const host = `${generateUUID()}.sns`;
+                    const skychatDiv = `<skychat id="skychat_host" style="display: none">`;
+                    const endingIndex = result.lastIndexOf(skychatDiv);
+                    const newPage = result.substring(0, endingIndex) 
                     + `${skychatDiv}${host}</skychat><sns_comments id="sns_comments" style="display: none"></sns_comments></body>`;
-                    var blob = new Blob([newPage],{ type: 'text/html' });
+                    const blob = new Blob([newPage],{ type: 'text/html' });
                     var formData = new FormData();
                     formData.append('file', blob);
                     const uuid = generateUUID();
@@ -252,15 +226,8 @@
                 })
         }
         function clickToPermalink() {
-            sessionStorage.setItem(getHost() + "_state", "newChat");
-            document.getElementById("login_modal").style.display = "none";
-            document.getElementById("secret_modal").style.display = "none";
-            document.getElementById("portal_modal").style.display = "none";
-            document.getElementById("comment_modal").style.display = "none";
-            document.getElementById("new_chat_modal").style.display = "none";
-            document.getElementById("permalink_modal").style.display = "block";
+            showModal("permalink_modal");
             document.getElementById("permalink").innerHTML = `<div class="spinner-border" role="status"><span class="sr-only">In Progress...</span></div>`;
-            $("#resultsModal").modal("show");
             const pin = window.location.pathname.substring(1, 47);
             const newPage = `<script>`
                 + `const host = "${getHost()}";`
@@ -487,7 +454,7 @@
           </div>
         </div>
       </div>
-      <div id="new_chat_modal" class="modal-content" style="display: none;">
+      <div id="compose_modal" class="modal-content" style="display: none;">
         <div class="modal-header bg-success">
           <h5 class="modal-title">Creating New Chat Channel</h5>
         </div>

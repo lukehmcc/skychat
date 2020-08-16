@@ -80,7 +80,11 @@
                     contactImg = anonymousImg
                 }
                 var content = decrypt(comment.getElementsByTagName("content")[0].innerHTML);
-                if (content) {
+                if (epoch > 1597271880 && getSecret() === "base64") {
+                    encryptedMessagesCount++;
+                } else if (epoch < 1597271880 && getSecret() !== "base64") {
+                    encryptedMessagesCount++;
+                } else if (content) {
                     var commentHtml = `<div id='comment_${i}' class='row'><div class='col-1 px-2 py-2 border-top'><center><img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/></center></div><div class='col-11 px-2 py-2 border-top'><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${content}</div></div>`;
                     var encryptedMessageHTML = "";
                     if (encryptedMessagesCount > 0) {

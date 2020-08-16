@@ -60,7 +60,7 @@
             var commentsHTML = "";
             if (snsComments.length == 0 && localStorage.getItem(getHost() + "_user") !== null) {
                 var welcomeHTML = `<h2>Welcome to your new chat channel.</h2><div>Your channel secret is currently set to "${getSecret()}". Click the <a href='#' onclick='clickToChangeSecret()'>Secret</a> menu option to change the current channel secret. Click the <a href='#' onclick='clickToPermalink()'>Permalink</a> menu option at any time to generate a sharable Skylink to your chat channel. This permalink will have the current channel secret embedded in it so that everyone can talk to eachother.</div>`;
-                commentsHTML = getSuccessMessage(welcomeHTML);
+                commentsHTML = getSuccessComment(welcomeHTML);
             }
             for (var i = snsComments.length-1, min = i - (commentStep * commentOffset); i >= 0 && i > min; i--) {
                 var comment = snsComments[i];
@@ -85,11 +85,8 @@
                 } else if (epoch < 1597271880 && getSecret() !== "base64") {
                     encryptedMessagesCount++;
                 } else if (content) {
-                    var commentHtml = `<div id='comment_${i}' class='row'><div class='col-1 px-2 py-2 border-top'><center><img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/></center></div><div class='col-11 px-2 py-2 border-top'><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${content}</div></div>`;
-                    var encryptedMessageHTML = "";
-                    if (encryptedMessagesCount > 0) {
-                        encryptedMessageHTML = getMutedMessage("Encrypted Messages");
-                    }
+                    var commentHtml = getComment(i, user, epoch, contactImg, content);
+                    var encryptedMessageHTML = encryptedMessagesCount > 0 ? getMutedComment("Encrypted Messages") : "";
                     commentsHTML = commentHtml + encryptedMessageHTML + commentsHTML;
                     encryptedMessagesCount = 0;
                 } else {
@@ -97,7 +94,7 @@
                 }
             }
             if (encryptedMessagesCount > 0) {
-                commentsHTML = getMutedMessage("Encrypted Messages") + commentsHTML;
+                commentsHTML = getMutedComment("Encrypted Messages") + commentsHTML;
             }
             var scrollComment = snsComments.length - 1 - (commentStep * (commentOffset - 1));
             if (scrollComment >= 20) {
@@ -108,11 +105,14 @@
                 window.scrollTo(0,document.getElementById("comment_" + scrollComment).offsetTop);
             }
         }
-        function getSuccessMessage(message) {
+        function getSuccessComment(message) {
             return `<div class='row text-success'><div class="col-12 px-2 py-2 border-top"><center>${message}</center></div></div>`;
         }
-        function getMutedMessage(message) {
+        function getMutedComment(message) {
             return `<div class='row text-muted'><div class="col-12 px-2 py-2 border-top"><center>${message}</center></div></div>`;
+        }
+        function getComment(i, user, epoch, image, message) {
+            return `<div id='comment_${i}' class='row'><div class='col-1 px-2 py-2 border-top'><center><img class='rounded-circle' width='50px' height='50px' src='${image}'/></center></div><div class='col-11 px-2 py-2 border-top'><b>${user}</b> <i>posted at ${new Date(epoch * 1000)}</i><br/>${message}</div></div>`;
         }
         function getHost() {
             return document.getElementById("skychat_host").innerHTML;

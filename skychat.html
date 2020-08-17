@@ -26,15 +26,15 @@
                 window.location.href = [window.location.protocol, '//', window.location.hostname, window.location.pathname].join('');
             }
             resetState();
-            loadComments();
+            loadComments(0);
             window.scrollTo(0,document.body.scrollHeight);
             setTimeout(function(){refresh();}, 3000);
             if (getUser() === null) {
                 clickToLogin();
             }
         }
-        function loadComments() {
-          gun.get(getHost()).on(function(data, key) {
+        function loadComments(offset) {
+          gun.get(getGunDbName(offset)).on(function(data, key) {
             var keys = Object.keys(data).sort();
             var shouldUpdate = false;
             var epochRegex = /^[0-9]{13}$/;
@@ -132,7 +132,7 @@
                 setTimeout(function(){autoLoadMoreComments();}, 250);
             } else {
                 commentOffset++;
-                loadComments();
+                loadComments(0);
             }
         }
         function refresh() {
@@ -142,7 +142,7 @@
                 } else if (document.getElementById("navbar-toggler").offsetHeight == document.getElementById("nav_about").offsetHeight) {
                     setTimeout(function(){refresh();}, 250);
                 } else {
-                    loadComments();
+                    loadComments(0);
                 }
             }
         }
@@ -238,7 +238,7 @@
             resetState();
             setSecret(document.getElementById('secret').value);
             $("#resultsModal").modal("hide");
-            loadComments();
+            loadComments(0);
         }
         function portal() {
             window.location.href = [window.location.protocol, '//', document.getElementById('portal').value, window.location.pathname, '?secret=', getSecret()].join('');
@@ -302,7 +302,7 @@
             var epoch = new Date().getTime();
             var contact = encrypt(getContact());
             document.getElementById("content").value = "";
-            gun.get(getHost()).put({ [epoch]: user+","+contact+","+content});
+            gun.get(getGunDbName(0)).put({ [epoch]: user+","+contact+","+content});
             $("#resultsModal").modal("hide");
         }
         function getHost() {
@@ -351,6 +351,14 @@
         }
         function getSkynetPortal() {
             return window.location.hostname;
+        }
+        function getGunDbName(offset) {
+            var epochDay = Math.round(new Date().getTime()/86400000);
+            if (epochDay - offset < 18493) {
+                return getHost();
+            } else {
+                return getHost() + "_" + (epochDay - offset);
+            }
         }
     </script>
 </head>

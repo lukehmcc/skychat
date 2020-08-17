@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html>
 <head>
     <title>Skychat</title>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
@@ -21,43 +22,18 @@
         window.onload = function() {
             if (new URLSearchParams(window.location.search).get(`secret`) !== null) {
                 getSecret(); //sets the secret into localStorage
-                window.location.href = [window.location.protocol, '//', document.getElementById('portal').value, window.location.pathname].join('');
+                window.location.href = [window.location.protocol, '//', window.location.hostname, window.location.pathname].join('');
+            }
+            if (getState() == "permalink_modal") {
+                clickToPermalink();
             } else {
-                if (getState() === null) {
-                    resetState();
-                }
-                loadComments();
-                var json = JSON.parse(new URLSearchParams(window.location.search).get(`json`));
-                if (json !== null && json.message !== null && json.message.length > 0) {
-                    alert(json.message);
-                }
-                window.scrollTo(0,document.body.scrollHeight);
-                setTimeout(function(){refresh();}, 6000);
-                if (getState() == "compose_modal") {
-                    clickToCompose();
-                } else if (getState() == "login_modal") {
-                    clickToLogin();
-                } else if (getState() == "portal_modal") {
-                    clickToChangePortal();
-                } else if (getState() == "new_chat_modal") {
-                    newChat();
-                } else if (getState() == "permalink_modal") {
-                    clickToPermalink();
-                }
-                if (getUser() === null) {
-                    clickToLogin();
-                }
-                if (getContact() !== null) {
-                    var contact = getContact();
-                    var contactImg = "";
-                    var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
-                    if (pinRegex.test(contact)) {
-                        contactImg = `/${contact}/`;
-                    } else {
-                        contactImg = anonymousImg
-                    }
-                    document.getElementById("compose_modal_avatar").innerHTML = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/> ${getUser()}`;
-                }
+                resetState();
+            }
+            loadComments();
+            window.scrollTo(0,document.body.scrollHeight);
+            setTimeout(function(){refresh();}, 6000);
+            if (getUser() === null) {
+                clickToLogin();
             }
         }
         function loadComments() {
@@ -65,10 +41,6 @@
             var snsComments = Object.entries(data);
             var encryptedMessagesCount = 0;
             var commentsHTML = "";
-            if (snsComments.length < 2 && getUser() !== null) {
-                var welcomeHTML = `<h2>Welcome to your new chat channel.</h2><div>Your channel secret is currently set to "${getSecret()}". Click the <a href='#' onclick='clickToChangeSecret()'>Secret</a> menu option to change the current channel secret. Click the <a href='#' onclick='clickToPermalink()'>Permalink</a> menu option at any time to generate a sharable Skylink to your chat channel. This permalink will have the current channel secret embedded in it so that everyone can talk to eachother.</div>`;
-                commentsHTML = getSuccessComment(welcomeHTML);
-            }
             var epochRegex = /^[0-9]{13}$/;
             for (var i = snsComments.length-1, min = i - (commentStep * commentOffset); i >= 0 && i > min; i--) {
                 var entry = snsComments[i];
@@ -107,14 +79,13 @@
             if (scrollComment >= 20) {
                 setTimeout(function(){autoLoadMoreComments();}, 1000);
             }
-            document.getElementById("comments").innerHTML =  commentsHTML;
+            if (commentsHTML !== "") {
+                document.getElementById("comments").innerHTML = commentsHTML;
+            }
             if (scrollComment >= 20 && commentOffset > 1 && scrollComment >=0 && document.getElementById("comment_" + scrollComment) != null) {
                 window.scrollTo(0,document.getElementById("comment_" + scrollComment).offsetTop);
             }
           })
-        }
-        function getSuccessComment(message) {
-            return `<div class='row text-success'><div class="col-12 px-2 py-2 border-top"><center>${message}</center></div></div>`;
         }
         function getMutedComment(message) {
             return `<div class='row text-muted'><div class="col-12 px-2 py-2 border-top"><center>${message}</center></div></div>`;
@@ -187,6 +158,17 @@
             document.getElementById('portal').value = getSkynetPortal();
         }
         function clickToCompose() {
+            if (getContact() !== null) {
+                var contact = getContact();
+                var contactImg = "";
+                var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
+                if (pinRegex.test(contact)) {
+                    contactImg = `/${contact}/`;
+                } else {
+                    contactImg = anonymousImg
+                }
+                document.getElementById("compose_modal_avatar").innerHTML = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/> ${getUser()}`;
+            }
             showModal("compose_modal");
         }
         function newChat() {
@@ -242,7 +224,6 @@
             loadComments();
         }
         function portal() {
-            resetState();
             window.location.href = [window.location.protocol, '//', document.getElementById('portal').value, window.location.pathname, '?secret=', getSecret()].join('');
         }
         function login() {
@@ -286,11 +267,9 @@
             resetUser();
             resetContact();
             document.getElementById("compose_modal_avatar").innerHTML = "";
-            $("#resultsModal").modal("hide");
+            clickToLogin();
         }
         function save() {
-            document.getElementById('save-trigger-container').innerHTML 
-                = `<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>`;
             var theSecret = getSecret();
             if (theSecret == "plaintext") {
                 alert("Posting with the chat channel's secret set to `" + theSecret + "` has been disabled. Please set the secret to something else.");
@@ -301,6 +280,7 @@
             var epoch = new Date().getTime();
             var contact = encrypt(getContact());
             var content = encrypt(document.getElementById("content").value);
+            document.getElementById("content").value = "";
             gun.get(getHost()).put({ [epoch]: user+","+contact+","+content});
             $("#resultsModal").modal("hide");
         }
@@ -390,7 +370,18 @@
 </nav>
 
 <br/><br/><br/>
-<div id='comments' class='container'></div>
+<div id='comments' class='container'>
+    <div id="welcome_message" class='row text-success'>
+        <div class="col-12 px-2 py-2 border-top">
+            <center>
+                <h2>Welcome to your new chat channel.</h2>
+                <div>
+                    Click the <a href='#' onclick='clickToChangeSecret()'>Secret</a> menu option to change the current channel secret. Click the <a href='#' onclick='clickToPermalink()'>Permalink</a> menu option at any time to generate a sharable Skylink to your chat channel. This permalink will have the current channel secret embedded in it so that everyone can talk to eachother.
+                </div>
+            </center>
+        </div>
+    </div>
+</div>
 
 <div class="container">
   <div class="modal" id="resultsModal" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" style="display: none;">
@@ -489,7 +480,7 @@
         </div>
         <div class="modal-body">
           <div class="md-form">
-            <div class="input-group mb-3 text-dark">Permalinks are sharable Skylinks to the chat channel that has the secret embedded in it.</div>
+            <div class="input-group mb-3 text-dark">Permalinks are sharable Skylinks to the chat channel that have the secret embedded in it.</div>
             <div id="permalink" class="input-group mb-3 text-dark"></div>
           </div>
         </div>
@@ -535,4 +526,5 @@
   </div>
 </nav>
 
-<skychat id="skychat_host" style="display: none">ghdsfgjdshfkjdhas.sns</skychat><sns_comments id="sns_comments" style="display: none"></sns_comments></body>
+<skychat id="skychat_host" style="display: none">ghdsfgjdshfkjdhas.sns</skychat>
+</body></html>

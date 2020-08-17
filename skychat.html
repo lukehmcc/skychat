@@ -25,11 +25,7 @@
                 getSecret(); //sets the secret into localStorage
                 window.location.href = [window.location.protocol, '//', window.location.hostname, window.location.pathname].join('');
             }
-            if (getState() == "permalink_modal") {
-                clickToPermalink();
-            } else {
-                resetState();
-            }
+            resetState();
             loadComments();
             window.scrollTo(0,document.body.scrollHeight);
             setTimeout(function(){refresh();}, 3000);

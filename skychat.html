@@ -105,23 +105,25 @@
                 }
                 if (commentsHTML !== "") {
                     document.getElementById("welcome").innerHTML = "";
-                    if (offset == 0) {
-                        document.getElementById("comments").innerHTML = commentsHTML;
-
-                    } else {
-                        var gunDbName = getGunDbName(offset);
-                        var history = document.getElementById(gunDbName);
-                        if (history == null) {
-                            document.getElementById("history").innerHTML = `<div id="${gunDbName}">${commentsHTML}</div>` + document.getElementById("history").innerHTML;
+                    var gunDbName = getGunDbName(offset);
+                    var gunDbComments = document.getElementById(gunDbName);
+                    var atBottom = (window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 2;
+                    if (gunDbComments == null) {
+                        if (offset == 0) {
+                            document.getElementById("comments").innerHTML += `<div id="${gunDbName}"></div>`;
                         } else {
-                            history.innerHTML = commentsHTML;
+                            document.getElementById("comments").innerHTML = `<div id="${gunDbName}"></div>${document.getElementById("comments").innerHTML}`;
                         }
+                        gunDbComments = document.getElementById(gunDbName);
+                    }
+                    gunDbComments.innerHTML = commentsHTML;
+                    if (atBottom) {
+                        window.scrollTo(0,document.body.scrollHeight);
                     }
                 }
                 autoLoadMoreComments();
             }
           })
-
         }
         function getMutedComment(message) {
             return `<div class='row text-muted'><div class="col-12 px-2 py-2 border-top"><center>${message}</center></div></div>`;

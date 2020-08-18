@@ -24,7 +24,6 @@
                 getSecret(); //sets the secret into localStorage
                 window.location.href = [window.location.protocol, '//', window.location.hostname, window.location.pathname].join('');
             }
-            resetState();
             loadComments(0);
             window.scrollTo(0,document.body.scrollHeight);
             setTimeout(function(){refresh();}, 3000);
@@ -105,7 +104,7 @@
                     document.getElementById("welcome").innerHTML = "";
                     var gunDbName = getGunDbName(offset);
                     var gunDbComments = document.getElementById(gunDbName);
-                    var atBottom = (window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 2;
+                    var atBottom = isWindowAtBottom();
                     if (gunDbComments == null) {
                         if (offset == 0) {
                             document.getElementById("comments").innerHTML += `<div id="${gunDbName}"></div>`;
@@ -145,20 +144,16 @@
         function autoLoadMoreComments() {
             if (window.pageYOffset != 0) {
                 setTimeout(function(){autoLoadMoreComments();}, 250);
-            } else if(getState() != "chat"){
-                setTimeout(function(){autoLoadMoreComments();}, 250);
             } else if (getEpochDay(commentOffset) > getEpoch()){
                 commentOffset++;
                 loadComments(commentOffset);
             }
         }
         function refresh() {
-            if(getState() == "chat"){
-                if ((window.innerHeight + Math.ceil(window.pageYOffset + 1)) < document.body.offsetHeight) {
-                    setTimeout(function(){refresh();}, 250);
-                } else {
-                    loadComments(0);
-                }
+            if (isWindowAtBottom()) {
+                loadComments(0);
+            } else {
+                setTimeout(function(){refresh();}, 250);
             }
         }
         function generateUUID() {
@@ -170,7 +165,6 @@
             return uuid;
         }
         function showModal(selection) {
-            setState(selection);
             const modalIds = ["login_modal", "secret_modal", "portal_modal", "compose_modal", "new_chat_modal", "permalink_modal"];
             modalIds.forEach(modalId => {
                 var modalDisplay = modalId === selection ? "block" : "none";
@@ -221,7 +215,6 @@
                     fetch(`/skynet/skyfile/${uuid}?filename=comment.html`, {method: 'POST',body: formData})
                         .then(response => response.json())
                         .then(result => {
-                            resetState();
                             window.location.pathname = `/${result.skylink}/`;
                         })
                         .catch(error => {console.error('Error:', error)});
@@ -246,11 +239,9 @@
                 .catch(error => {console.error('Error:', error)});
         }
         function cancel() {
-            resetState();
             $("#resultsModal").modal("hide");
         }
         function secret() {
-            resetState();
             setSecret(document.getElementById('secret').value);
             $("#resultsModal").modal("hide");
             loadComments(0);
@@ -276,23 +267,19 @@
                     dataType: 'json',
                     success: function (data, textStatus, jqXHR) {
                         setContact(data.skylink);
-                        resetState();
                         $("#resultsModal").modal("hide");
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        resetState();
                         $("#resultsModal").modal("hide");
                     }
                 });
             } else {
-                resetState();
                 $("#resultsModal").modal("hide");
             }
         }
         function anonomous_login() {
             setUser("Anonomous");
             setContact("");
-            resetState();
             $("#resultsModal").modal("hide");
         }
         function logout() {
@@ -340,15 +327,6 @@
         function setSecret(secret) {
             localStorage.setItem(getHost() + "_secret", secret);
         }
-        function getState() {
-            return sessionStorage.getItem(getHost() + "_state");
-        }
-        function setState(state) {
-            sessionStorage.setItem(getHost() + "_state", state);
-        }
-        function resetState() {
-            setState("chat");
-        }
         function getUser() {
             return localStorage.getItem(getHost() + "_user");
         }
@@ -380,6 +358,9 @@
         }
         function getEpochDay(offset) {
             return Math.round(new Date().getTime()/86400000) - offset;
+        }
+        function isWindowAtBottom() {
+            return (window.innerHeight + window.pageYOffset) > document.body.offsetHeight - 5;
         }
     </script>
 </head>

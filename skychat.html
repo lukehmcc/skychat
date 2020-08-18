@@ -24,6 +24,7 @@
                 getSecret(); //sets the secret into localStorage
                 window.location.href = [window.location.protocol, '//', window.location.hostname, window.location.pathname].join('');
             }
+            setAvatar();
             loadComments(0);
             window.scrollTo(0,document.body.scrollHeight);
             setTimeout(function(){refresh();}, 3000);
@@ -165,7 +166,7 @@
             return uuid;
         }
         function showModal(selection) {
-            const modalIds = ["login_modal", "secret_modal", "portal_modal", "compose_modal", "new_chat_modal", "permalink_modal"];
+            const modalIds = ["login_modal", "secret_modal", "portal_modal", "new_chat_modal", "permalink_modal"];
             modalIds.forEach(modalId => {
                 var modalDisplay = modalId === selection ? "block" : "none";
                 document.getElementById(modalId).style.display = modalDisplay;
@@ -182,20 +183,6 @@
         function clickToChangePortal() {
             showModal("portal_modal");
             document.getElementById('portal').value = getSkynetPortal();
-        }
-        function clickToCompose() {
-            if (getContact() !== null) {
-                var contact = getContact();
-                var contactImg = "";
-                var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
-                if (pinRegex.test(contact)) {
-                    contactImg = `/${contact}/`;
-                } else {
-                    contactImg = anonymousImg
-                }
-                document.getElementById("compose_modal_avatar").innerHTML = `<img class='rounded-circle' width='50px' height='50px' src='${contactImg}'/> ${getUser()}`;
-            }
-            showModal("compose_modal");
         }
         function newChat() {
             showModal("new_chat_modal");
@@ -267,13 +254,16 @@
                     dataType: 'json',
                     success: function (data, textStatus, jqXHR) {
                         setContact(data.skylink);
+                        setAvatar();
                         $("#resultsModal").modal("hide");
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
+                        setAvatar();
                         $("#resultsModal").modal("hide");
                     }
                 });
             } else {
+                setAvatar();
                 $("#resultsModal").modal("hide");
             }
         }
@@ -285,7 +275,7 @@
         function logout() {
             resetUser();
             resetContact();
-            document.getElementById("compose_modal_avatar").innerHTML = "";
+            setAvatar();
             clickToLogin();
         }
         function save() {
@@ -362,11 +352,20 @@
         function isWindowAtBottom() {
             return (window.innerHeight + window.pageYOffset) > document.body.offsetHeight - 5;
         }
+
+        function setAvatar() {
+            var contact = getContact();
+            var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
+            var contactImg = contact !== null && pinRegex.test(contact) ? `/${contact}/` : anonymousImg;
+            document.getElementById("avatar").innerHTML = `<img src='${contactImg}' class='rounded-circle d-inline-block align-top' width='30px' height='30px' alt='${getUser()}'/>`;
+        }
     </script>
 </head>
 <body class="bg-dark text-white">
 
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-success">
+  <a id="avatar" class="navbar-brand" href="#skychat">
+  </a>
   <button id="navbar-toggler" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -524,41 +523,25 @@
           </div>
         </div>
       </div>
-      <div id="compose_modal" class="modal-content" style="display: none;">
-        <div class="modal-header bg-success">
-          <h5 id="compose_modal_avatar" class="modal-title"></h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick='cancel()'>
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="md-form">
-            <textarea id="content" class="md-textarea form-control" rows="3" placeholder="Message group..."></textarea>
-          </div>
-          <p id="results"></p>
-          <div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>
-        </div>
-        <div class="modal-footer bg-success">
-          <div id='save-trigger-container'>
-            <button id='save-trigger' type='button' class="btn btn-secondary" onclick='save()'>Comment</button>
-            <button type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
 
-<br/><br/><br/>
 <nav class="navbar navbar-expand-lg navbar-dark fixed-bottom bg-success">
   <div class="input-group mb-3">
     <div class="input-group-prepend">
       <span class="input-group-text">✎</span>
     </div>
-    <input type="text" class="form-control" placeholder="Message group..." onclick='clickToCompose();$("#resultsModal").modal("show")'>
+    <textarea id="content" class="md-textarea form-control" rows="1" placeholder="Message group..."></textarea>
+    <div class="input-group-append">
+      <button class="btn btn-primary" type="button" onclick="save()">OK</button>
+      <button class="btn btn-danger" type="button" onclick="document.getElementById('content').value = '';">Cancel</button>
+    </div>
   </div>
 </nav>
 
+<br/><br/><br/>
+<skychat id="skychat"></skychat>
 <skychat id="skychat_host" style="display: none">ghdsfgjdshfkjdhas.sns</skychat>
 <skychat id="skychat_epoch" style="display: none">18490</skychat>
 </body></html>

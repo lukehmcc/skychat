@@ -297,6 +297,13 @@
             gun.get(getGunDbName(0)).put({ [epoch]: user+","+contact+","+content});
             $("#resultsModal").modal("hide");
         }
+        function expandTextarea(id) {
+            document.getElementById(id).addEventListener('keyup', function() {
+                this.style.overflow = 'hidden';
+                this.style.height = 0;
+                this.style.height = this.scrollHeight > 250 ? '250px' : this.scrollHeight + 'px';
+            }, false);
+        }
         function getHost() {
             return document.getElementById("skychat_host").innerHTML;
         }
@@ -352,7 +359,6 @@
         function isWindowAtBottom() {
             return (window.innerHeight + window.pageYOffset) > document.body.offsetHeight - 5;
         }
-
         function setAvatar() {
             var contact = getContact();
             var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
@@ -532,7 +538,7 @@
     <div class="input-group-prepend">
       <span class="input-group-text">✎</span>
     </div>
-    <textarea id="content" class="md-textarea form-control" rows="1" placeholder="Message group..."></textarea>
+    <textarea id="content" class="md-textarea form-control" rows="1" placeholder="Message group..." onclick="expandTextarea(this.id)"></textarea>
     <div class="input-group-append">
       <button class="btn btn-primary" type="button" onclick="save()">OK</button>
       <button class="btn btn-danger" type="button" onclick="document.getElementById('content').value = '';">Cancel</button>

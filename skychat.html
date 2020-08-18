@@ -58,7 +58,6 @@
             if (!hasData) {
                 autoLoadMoreComments();
             } else if (shouldUpdate) {
-                var encryptedMessagesCount = 0;
                 var commentsHTML = "";
                 for (var i = keys.length - 1; i >= 0; i--) {
                     var key = keys[i];
@@ -85,12 +84,7 @@
                                 }
                                 var content = decrypt(comment.split(",")[2]);
                                 if (content) {
-                                    var commentHtml = getComment(i, user, epoch, contactImg, content);
-                                    var encryptedMessageHTML = encryptedMessagesCount > 0 ? getMutedComment("Encrypted Messages") : "";
-                                    commentsHTML = commentHtml + encryptedMessageHTML + commentsHTML;
-                                    encryptedMessagesCount = 0;
-                                } else {
-                                    encryptedMessagesCount++;
+                                    commentsHTML = getComment(i, user, epoch, contactImg, content) + commentsHTML;
                                 }
                             }
                         } catch (err) {
@@ -98,9 +92,6 @@
                         }
                     }
                 };
-                if (encryptedMessagesCount > 0) {
-                    commentsHTML = getMutedComment("Encrypted Messages") + commentsHTML;
-                }
                 if (commentsHTML !== "") {
                     document.getElementById("welcome").innerHTML = "";
                     var gunDbName = getGunDbName(offset);

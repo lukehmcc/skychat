@@ -62,7 +62,6 @@
             } else if (shouldUpdate) {
                 var encryptedMessagesCount = 0;
                 var commentsHTML = "";
-                var commentTarget = null;
                 for (var i = keys.length - 1; i >= 0; i--) {
                     var key = keys[i];
                     if (epochRegex.test(key) && Number(key) < new Date().getTime()) {
@@ -94,9 +93,6 @@
                                     encryptedMessagesCount = 0;
                                 } else {
                                     encryptedMessagesCount++;
-                                }
-                                if (commentTarget == null) {
-                                    commentTarget = "comment_" + i;
                                 }
                             }
                         } catch (err) {
@@ -131,7 +127,7 @@
             return `<div class='row text-muted'><div class="col-12 px-2 py-2 border-top"><center>${message}</center></div></div>`;
         }
         function getComment(i, user, epoch, image, message) {
-            return `<div id='comment_${i}' class='row'><div class='col-1 px-2 py-2 border-top'><center><img class='rounded-circle' width='50px' height='50px' src='${image}'/></center></div><div class='col-11 px-2 py-2 border-top'><b>${user}</b> <i>posted at ${new Date(Number(epoch))}</i><br/>${message}</div></div>`;
+            return `<div class='row'><div class='col-1 px-2 py-2 border-top'><center><img class='rounded-circle' width='50px' height='50px' src='${image}'/></center></div><div class='col-11 px-2 py-2 border-top'><b>${user}</b> <i>posted at ${new Date(Number(epoch))}</i><br/>${message}</div></div>`;
         }
         function stripXSS(data) {
             return data.replace(/</g,"&lt;").replace(/>/g,"&gt;");

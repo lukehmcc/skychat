@@ -151,7 +151,7 @@
                 setTimeout(function(){autoLoadMoreComments();}, 250);
             } else if (document.getElementById("navbar-toggler").offsetHeight == document.getElementById("nav_about").offsetHeight) {
                 setTimeout(function(){autoLoadMoreComments();}, 250);
-            } else if (getEpochDay(commentOffset) > 18490){
+            } else if (getEpochDay(commentOffset) > getEpoch()){
                 commentOffset++;
                 loadComments(commentOffset);
             }
@@ -219,7 +219,7 @@
                     const skychatDiv = `<skychat id="skychat_host" style="display: none">`;
                     const endingIndex = result.lastIndexOf(skychatDiv);
                     const newPage = result.substring(0, endingIndex) 
-                    + `${skychatDiv}${host}</skychat><sns_comments id="sns_comments" style="display: none"></sns_comments></body>`;
+                    + `${skychatDiv}${host}</skychat><skychat id="skychat_epoch" style="display: none">${getEpochDay(1)}</skychat></body></html>`;
                     const blob = new Blob([newPage],{ type: 'text/html' });
                     var formData = new FormData();
                     formData.append('file', blob);
@@ -328,6 +328,9 @@
         }
         function getHost() {
             return document.getElementById("skychat_host").innerHTML;
+        }
+        function getEpoch() {
+            return Number(document.getElementById("skychat_epoch").innerHTML);
         }
         function getSecret() {
             var theSecret = new URLSearchParams(window.location.search).get(`secret`);
@@ -582,4 +585,5 @@
 </nav>
 
 <skychat id="skychat_host" style="display: none">ghdsfgjdshfkjdhas.sns</skychat>
+<skychat id="skychat_epoch" style="display: none">18490</skychat>
 </body></html>

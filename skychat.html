@@ -294,20 +294,22 @@
             var theSecret = getSecret();
             if (theSecret == "plaintext") {
                 alert("Posting with the chat channel's secret set to `" + theSecret + "` has been disabled. Please set the secret to something else.");
-                $("#resultsModal").modal("hide");
+            } else {
+                var content = document.getElementById("content").value;
+                if (content == null || content.trim().length == 0) {
+                    alert("Can not submit empty message.");
+                } else if (content.length > 8000) {
+                    alert("Message too large.");
+                } else {
+                    content = encrypt(content);
+                    var pin = window.location.pathname.substring(1, 47);
+                    var user = encrypt(getUser());
+                    var epoch = new Date().getTime();
+                    var contact = encrypt(getContact());
+                    gun.get(getGunDbName(0)).put({ [epoch]: user+","+contact+","+content});
+                }
             }
-            var content = encrypt(document.getElementById("content").value);
-            if (content.length > 8000) {
-                alert("Message too large.");
-                $("#resultsModal").modal("hide");
-            }
-            var pin = window.location.pathname.substring(1, 47);
-            var user = encrypt(getUser());
-            var epoch = new Date().getTime();
-            var contact = encrypt(getContact());
-            document.getElementById("content").value = "";
-            gun.get(getGunDbName(0)).put({ [epoch]: user+","+contact+","+content});
-            $("#resultsModal").modal("hide");
+            resetTextarea('content');
         }
         var originalHeight = null;
         function expandTextarea(id) {
@@ -322,6 +324,7 @@
         }
         function resetTextarea(id) {
             var textArea = document.getElementById(id);
+            textArea.value = null;
             if (originalHeight !== null) {
                 textArea.style.height = originalHeight + 'px';
             }
@@ -562,8 +565,8 @@
     </div>
     <textarea id="content" class="md-textarea form-control" rows="1" placeholder="Message group..." onclick="expandTextarea(this.id)"></textarea>
     <div class="input-group-append">
-      <button class="btn btn-primary" type="button" onclick="save();resetTextarea('content');">OK</button>
-      <button class="btn btn-danger" type="button" onclick="document.getElementById('content').value = '';resetTextarea('content');">Cancel</button>
+      <button class="btn btn-primary" type="button" onclick="save();">OK</button>
+      <button class="btn btn-danger" type="button" onclick="resetTextarea('content');">Cancel</button>
     </div>
   </div>
 </nav>

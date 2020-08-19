@@ -12,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.0.0/crypto-js.min.js" integrity="sha384-0GjPiy2OWGZr3mGFrBPHGVu/8A+YHOeDXUFWv6NDA2nO6eVq9UoFnzUSy1bVv8FE" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/gun.js" integrity="sha384-0kBpxICYZoT8h+AK/aFHPTnvg3pFQle+S3pwvmMoUPIGBuXaHTiqNUPGRvpOU1ea" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/not.js" integrity="sha384-1tPi3AL7O+RyZptCFmnrEiZ41GSY27D0p38b9R31mJ8fjOAYCjvcrrciqFgIcnNC" crossorigin="anonymous"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js'></script>
 
     <script>
         var gun = Gun(['https://mvp-gun.herokuapp.com/gun', 'https://e2eec.herokuapp.com/gun']);
@@ -20,7 +21,7 @@
             // add CTRL+Enter keybind
             document.addEventListener("keydown", (event) => {
                 if (event.key === "Enter" && event.ctrlKey) {
-                    save();
+                    compose();
                 }
             });
         });
@@ -96,7 +97,7 @@
                                 } else {
                                     contactImg = anonymousImg
                                 }
-                                var content = decrypt(comment.split(",")[2]);
+                                var content = new showdown.Converter().makeHtml(decrypt(comment.split(",")[2]).replace("![", "! ["));
                                 if (content) {
                                     commentsHTML = getComment(i, user, epoch, contactImg, content) + commentsHTML;
                                 }
@@ -181,12 +182,17 @@
             return uuid;
         }
         function showModal(selection) {
-            const modalIds = ["login_modal", "secret_modal", "portal_modal", "new_chat_modal", "permalink_modal"];
+            const modalIds = ["upload_modal", "login_modal", "secret_modal", "portal_modal", "new_chat_modal", "permalink_modal"];
             modalIds.forEach(modalId => {
                 var modalDisplay = modalId === selection ? "block" : "none";
                 document.getElementById(modalId).style.display = modalDisplay;
             });
             $("#resultsModal").modal("show");
+        }
+        function clickToUpload() {
+            document.getElementById('upload-trigger-container').style.display = `block`;
+            document.getElementById('upload-loading-container').style.display = `none`;
+            showModal("upload_modal");
         }
         function clickToLogin() {
             showModal("login_modal");
@@ -251,6 +257,33 @@
         function portal() {
             window.location.href = [window.location.protocol, '//', document.getElementById('portal').value, window.location.pathname, '?secret=', getSecret()].join('');
         }
+        function upload() {
+            document.getElementById('upload-trigger-container').style.display = `none`;
+            document.getElementById('upload-loading-container').style.display = `block`;
+            var file = document.getElementById('upload').files[0];
+            if (file != null) {
+                $.ajax({
+                    url: `/skynet/skyfile/${generateUUID()}?filename=${file.name}`,
+                    type: 'POST',
+                    data: file,
+                    mimeType: "multipart/form-data",
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    dataType: 'json',
+                    success: function (data, textStatus, jqXHR) {
+                        put(`[${file.name}](/${data.skylink}/)`);
+                        $("#resultsModal").modal("hide");
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $("#resultsModal").modal("hide");
+                        alert("Unable to upload file.")
+                    }
+                });
+            } else {
+                alert("No file to upload");
+            }
+        }
         function login() {
             document.getElementById('login-trigger-container').innerHTML 
                 = `<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>`;
@@ -293,24 +326,26 @@
             setAvatar();
             clickToLogin();
         }
-        function save() {
+        function compose() {
+            var content = document.getElementById("content").value;
+            if (content == null || content.trim().length == 0) {
+                alert("Can not submit empty message.");
+            } else if (content.length > 8000) {
+                alert("Message too large.");
+            } else {
+                put(content);
+            }
+        }
+        function put(content) {
             var theSecret = getSecret();
             if (theSecret == "plaintext") {
                 alert("Posting with the chat channel's secret set to `" + theSecret + "` has been disabled. Please set the secret to something else.");
             } else {
-                var content = document.getElementById("content").value;
-                if (content == null || content.trim().length == 0) {
-                    alert("Can not submit empty message.");
-                } else if (content.length > 8000) {
-                    alert("Message too large.");
-                } else {
-                    content = encrypt(content);
-                    var pin = window.location.pathname.substring(1, 47);
-                    var user = encrypt(getUser());
-                    var epoch = new Date().getTime();
-                    var contact = encrypt(getContact());
-                    gun.get(getGunDbName(0)).put({ [epoch]: user+","+contact+","+content});
-                }
+                var pin = window.location.pathname.substring(1, 47);
+                var user = encrypt(getUser());
+                var epoch = new Date().getTime();
+                var contact = encrypt(getContact());
+                gun.get(getGunDbName(0)).put({ [epoch]: user+","+contact+","+encrypt(content)});
             }
             resetTextarea('content');
         }
@@ -452,6 +487,32 @@
 <div class="container">
   <div class="modal" id="resultsModal" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" style="display: none;">
     <div class="modal-dialog">
+      <div id="upload_modal" class="modal-content" style="display: none;">
+        <div class="modal-header bg-success">
+          <h5 class="modal-title">Upload</h5>
+        </div>
+        <div class="modal-body">
+          <div class="md-form">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">File</span>
+              </div>
+              <form id="contact_form">
+                <input id="upload" type="file" class="form-control">
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-success">
+          <div id='upload-trigger-container' style="display: block;">
+            <button type='button' class="btn btn-secondary" onclick='upload()'>OK</button>
+            <button type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
+          </div>
+          <div id='upload-loading-container' style="display: none;">
+            <div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>
+          </div>
+        </div>
+      </div>
       <div id="login_modal" class="modal-content" style="display: none;">
         <div class="modal-header bg-success">
           <h5 class="modal-title">Login</h5>
@@ -564,11 +625,11 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-bottom bg-success">
   <div class="input-group mb-3">
     <div class="input-group-prepend">
-      <span class="input-group-text">✎</span>
+      <button class="btn btn-secondary" type="button" onclick="clickToUpload();">+</button>
     </div>
     <textarea id="content" class="md-textarea form-control" rows="1" placeholder="Message group..." onclick="expandTextarea(this.id)"></textarea>
     <div class="input-group-append">
-      <button class="btn btn-primary" type="button" onclick="save();">OK</button>
+      <button class="btn btn-primary" type="button" onclick="compose();">OK</button>
       <button class="btn btn-danger" type="button" onclick="resetTextarea('content');">Cancel</button>
     </div>
   </div>

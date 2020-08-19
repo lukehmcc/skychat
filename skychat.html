@@ -50,6 +50,9 @@
           })
           .on(function(data, key) {
             var gunDbName = getGunDbName(offset);
+            if (document.getElementById(gunDbName) == null) {
+                document.getElementById("comments").innerHTML = `<div id="${gunDbName}"></div>${document.getElementById("comments").innerHTML}`;
+            }
             var keys = Object.keys(data).sort();
             var hasData = false;
             var shouldUpdate = false;

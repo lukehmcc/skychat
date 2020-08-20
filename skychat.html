@@ -245,8 +245,7 @@
         }
         function secret() {
             setSecret(document.getElementById('secret').value);
-            $("#resultsModal").modal("hide");
-            loadComments(0);
+            window.location = window.location;
         }
         function portal() {
             window.location.href = [window.location.protocol, '//', document.getElementById('portal').value, window.location.pathname, '?secret=', getSecret()].join('');

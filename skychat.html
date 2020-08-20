@@ -42,7 +42,6 @@
             setAvatar();
             loadComments(0);
             window.scrollTo(0,document.body.scrollHeight);
-            setTimeout(function(){refresh();}, 3000);
             if (getUser() === null) {
                 clickToLogin();
             }
@@ -168,13 +167,6 @@
             } else if (getEpochDay(commentOffset) > getEpoch()){
                 commentOffset++;
                 loadComments(commentOffset);
-            }
-        }
-        function refresh() {
-            if (isWindowAtBottom()) {
-                loadComments(0);
-            } else {
-                setTimeout(function(){refresh();}, 250);
             }
         }
         function generateUUID() {

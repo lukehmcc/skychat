@@ -331,15 +331,10 @@
             }
         }
         function put(content) {
-            var theSecret = getSecret();
-            if (theSecret == "plaintext") {
+            if (getSecret() === "plaintext") {
                 alert(`Posting with the chat channel's secret set to "plaintext" has been disabled. Please set the secret to something else.`);
             } else {
-                var pin = window.location.pathname.substring(1, 47);
-                var user = encrypt(getUser());
-                var epoch = new Date().getTime();
-                var contact = encrypt(getContact());
-                gun.get(getGunDbName(0)).put({ [epoch]: user+","+contact+","+encrypt(content)});
+                gun.get(getGunDbName(0)).put({ [new Date().getTime()]: `${encrypt(getUser())},${encrypt(getContact())},${encrypt(content)}`});
             }
             resetTextarea('content');
         }

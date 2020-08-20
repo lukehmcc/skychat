@@ -2,7 +2,7 @@
 
 ## Public Example
 
-https://siasky.net/AAB4mRQKy0V4Sd_P8A0Qb9g3ANhjUyczJ4xX1gV9Dg-AmQ/
+https://skyportal.xyz/AABNp7FlU5IWJoDGMgSpbpTA0vbFe8MwEFMGkP6fnY9umA/
 
 ## About
 

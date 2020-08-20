@@ -333,7 +333,7 @@
         function put(content) {
             var theSecret = getSecret();
             if (theSecret == "plaintext") {
-                alert("Posting with the chat channel's secret set to `" + theSecret + "` has been disabled. Please set the secret to something else.");
+                alert(`Posting with the chat channel's secret set to "plaintext" has been disabled. Please set the secret to something else.`);
             } else {
                 var pin = window.location.pathname.substring(1, 47);
                 var user = encrypt(getUser());

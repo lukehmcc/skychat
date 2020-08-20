@@ -84,9 +84,7 @@
                     if (epochRegex.test(key) && Number(key) < new Date().getTime()) {
                         try {
                             var comment = data[key];
-                            if (comment.length > 10000) {
-                                commentsHTML = getMutedComment("Message Too Large") + commentsHTML;
-                            } else {
+                            if (comment.length < 10000) {
                                 var user = decrypt(comment.split(",")[0]);
                                 if (!user) {
                                     user = `<i>Anonomous</i>`
@@ -133,9 +131,6 @@
                 autoLoadMoreComments();
             }
           })
-        }
-        function getMutedComment(message) {
-            return `<div class='row text-muted'><div class='col-2 px-2 py-2 text-right'></div><div class="col-10 px-2 py-2 border-top"><center>${message}</center></div></div>`;
         }
         function getComment(i, user, epoch, image, message) {
             var postedAt = `right now`;

@@ -167,10 +167,10 @@
                 loadComments(commentOffset);
             }
         }
-        function generateUUID() {
+        function randomString(len) {
             let uuid = '';
             const cs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            for (let i = 0; i < 16; i++) {
+            for (let i = 0; i < len; i++) {
                 uuid += cs.charAt(Math.floor(Math.random() * cs.length));
             };
             return uuid;
@@ -207,7 +207,7 @@
             fetch(`/${pin}/`)
                 .then(response => response.text())
                 .then(result => {
-                    const host = `${generateUUID()}.sns`;
+                    const host = `${randomString(26)}`;
                     const skychatDiv = `<skychat id="skychat_host" style="display: none">`;
                     const endingIndex = result.lastIndexOf(skychatDiv);
                     const newPage = result.substring(0, endingIndex) 
@@ -215,8 +215,7 @@
                     const blob = new Blob([newPage],{ type: 'text/html' });
                     var formData = new FormData();
                     formData.append('file', blob);
-                    const uuid = generateUUID();
-                    fetch(`/skynet/skyfile/${uuid}?filename=comment.html`, {method: 'POST',body: formData})
+                    fetch(`/skynet/skyfile/${host}?filename=skychat.html`, {method: 'POST',body: formData})
                         .then(response => response.json())
                         .then(result => {
                             window.location.pathname = `/${result.skylink}/`;
@@ -235,7 +234,7 @@
             const blob = new Blob([newPage],{ type: 'text/html' });
             var formData = new FormData();
             formData.append('file', blob);
-            fetch(`/skynet/skyfile/${generateUUID()}?filename=permalink.html`, {method: 'POST',body: formData})
+            fetch(`/skynet/skyfile/${randomString(26)}?filename=permalink.html`, {method: 'POST',body: formData})
                 .then(response => response.json())
                 .then(result => {
                     document.getElementById("permalink").innerHTML = `<a href="/${result.skylink}/">${result.skylink}</a>`;
@@ -258,7 +257,7 @@
             var file = document.getElementById('upload').files[0];
             if (file != null) {
                 $.ajax({
-                    url: `/skynet/skyfile/${generateUUID()}?filename=${file.name}`,
+                    url: `/skynet/skyfile/${randomString(26)}?filename=${file.name}`,
                     type: 'POST',
                     data: file,
                     mimeType: "multipart/form-data",
@@ -287,7 +286,7 @@
             var file = document.getElementById('contact').files[0];
             if (file != null) {
                 $.ajax({
-                    url: `/skynet/skyfile/${generateUUID()}?filename=${file.name}`,
+                    url: `/skynet/skyfile/${randomString(26)}?filename=${file.name}`,
                     type: 'POST',
                     data: file,
                     mimeType: "multipart/form-data",
@@ -367,10 +366,8 @@
             var theSecret = new URLSearchParams(window.location.search).get(`secret`);
             if (theSecret) {
                 localStorage.setItem(getHost() + "_secret", theSecret);
-            } else if (localStorage.getItem(getHost() + "_secret") === null && getHost() === "chat.sns") {
-                localStorage.setItem(getHost() + "_secret", "plaintext");
             } else if (localStorage.getItem(getHost() + "_secret") === null){
-                localStorage.setItem(getHost() + "_secret", generateUUID());
+                localStorage.setItem(getHost() + "_secret", randomString(26));
             }
             return localStorage.getItem(getHost() + "_secret");
         }

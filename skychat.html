@@ -26,17 +26,20 @@
             if (new URLSearchParams(window.location.search).get(`secret`) !== null) {
                 getSecret(); //sets the secret into localStorage
                 window.location.href = [window.location.protocol, '//', window.location.hostname, window.location.pathname].join('');
-            }
-            initiateNetwork();
-            setAvatar();
-            var epochDifference = getEpochDay(0) - getEpoch() + 1;
-            for (var i = 0; i < epochDifference && i < 100; i++) {
-                prependCommentsContainer(i);
-            }
-            loadComments(0);
-            window.scrollTo(0,document.body.scrollHeight);
-            if (getUser() === null) {
-                clickToLogin();
+            } else {
+                initiateWelcomeMessage();
+                initiateNetwork();
+                initiatePortals();
+                setAvatar();
+                var epochDifference = getEpochDay(0) - getEpoch() + 1;
+                for (var i = 0; i < epochDifference && i < 100; i++) {
+                    prependCommentsContainer(i);
+                }
+                loadComments(0);
+                window.scrollTo(0,document.body.scrollHeight);
+                if (getUser() === null) {
+                    clickToLogin();
+                }
             }
         }
         function prependCommentsContainer(offset) {
@@ -203,8 +206,9 @@
             document.getElementById('secret').value = getSecret();
         }
         function clickToChangePortal() {
+            document.getElementById('portalKnown').style.display = ``;
             showModal("portal_modal");
-            document.getElementById('portal').value = getSkynetPortal();
+            document.getElementById("portal").value = "";
         }
         function newChat() {
             showModal("new_chat_modal");
@@ -272,7 +276,7 @@
                             var theNetwork = getNetwork() == "sia" ? "prime" : "sia";
                             var formData = new FormData();
                             formData.append('file', new Blob([result],{ type: 'text/html' }));
-                            fetch(`${thePortal}${getUploadPath(theNetwork)}${getHost()}?filename=skychat.html`, {method: 'POST',body: formData})
+                            fetch(`${thePortal}${getUploadPath(theNetwork)}${getHost()}?filename=skychat.html&force=true`, {method: 'POST',body: formData})
                                 .then(response => response.json())
                                 .then(result => {
                                     window.location.href = `${thePortal}/${result[getUploadResponseKey(theNetwork)]}/?secret=${getSecret()}`;
@@ -301,7 +305,7 @@
                     processData: false,
                     dataType: 'json',
                     success: function (data, textStatus, jqXHR) {
-                        put(`[${file.name}](https://${getSkynetPortal()}/${data[getUploadResponseKey(getNetwork())]}/)`);
+                        put(`[${file.name}](https://${getPortal()}/${data[getUploadResponseKey(getNetwork())]}/)`);
                         $("#resultsModal").modal("hide");
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
@@ -396,6 +400,11 @@
                 textArea.style.height = originalHeight + 'px';
             }
         }
+        function initiateWelcomeMessage() {
+            if (getEpochDay(0) - getEpoch() <= 1) {
+                document.getElementById("welcome").style.display = "block";
+            }
+        }
         function initiateNetwork() {
             var formData = new FormData();
             formData.append('file', new Blob([""],{ type: 'text/html' }));
@@ -406,23 +415,6 @@
                 })
                 .catch(error => {
                     setNetwork(`prime`);
-                });
-        }
-        function initiatePortal() {
-            const siaPath = `/skynet/skyfile/`;
-            const primePath = `/pubaccess/pubfile/`;
-            var uploadPath = sessionStorage.getItem(`${getHost()}_uploadPath`);
-            var formData = new FormData();
-            formData.append('file', new Blob([""],{ type: 'text/html' }));
-            fetch(`${siaPath}${randomString(26)}?dryrun=true&filename=exists.query`, {method: 'POST',body: formData})
-                .then(response => response.json())
-                .then(result => {
-                    sessionStorage.setItem(`${getHost()}_uploadPath`, siaPath);
-                    sessionStorage.setItem(`${getHost()}_uploadResponseKey`, `skylink`);
-                })
-                .catch(error => {
-                    sessionStorage.setItem(`${getHost()}_uploadPath`, primePath);
-                    sessionStorage.setItem(`${getHost()}_uploadResponseKey`, `publink`);
                 });
         }
         function getNetwork() {
@@ -436,6 +428,47 @@
         }
         function getUploadResponseKey(network) {
             return network === `sia` ? `skylink` : `publink`;
+        }
+        function initiatePortals() {
+            gun
+            .get(getGunDbName(0) + "_portals")
+            .not(function(key){
+                document.getElementById("portalSelect").innerHTML = `<option onclick="document.getElementById('portal').value=''">...</option><option onclick="document.getElementById('portal').value='${getPortal()}'">${getPortal()}</option>`;
+                putPortal(getPortal());
+            })
+            .on(function(data, key) {
+                var thePortals = new Object();
+                var theKeys = Object.keys(data);
+                var portalRegex = /^[a-zA-Z0-9-_\.].*$/;
+                for(var i  = 0; i < theKeys.length; i++) {
+                    var theKey = theKeys[i];
+                    if (theKey.length < 50) {
+                        try {
+                            var thePortal = decrypt(theKey);
+                            if (thePortal.length > 5 && portalRegex.test(thePortal)) {
+                                thePortals[thePortal] = "exists";
+                            }
+                        } catch(err) {
+                            //ignore
+                        }
+                    }
+                }
+                if (thePortals[getPortal()] !== "exists") {
+                    thePortals[getPortal()] = "exists";
+                    putPortal(getPortal());
+                }
+                var theOptions  = Object.keys(thePortals).sort();
+                document.getElementById("portalSelect").innerHTML = `<option onclick="document.getElementById('portal').value=''">...</option>`;
+                for(var i = 0; i < theOptions.length; i++) {
+                    document.getElementById("portalSelect").innerHTML += `<option onclick="document.getElementById('portal').value='${theOptions[i]}'">${theOptions[i]}</option>`;
+                }
+            })
+        }
+        function putPortal(portal) {
+            gun.get(getGunDbName(0) + "_portals").put({ [encrypt(portal)]: `${randomString(26)}`});
+        }
+        function getPortal() {
+            return window.location.hostname;
         }
         function getHost() {
             return document.getElementById("skychat_host").innerHTML;
@@ -472,9 +505,6 @@
         }
         function resetContact() {
             localStorage.removeItem(getHost() + "_contact");
-        }
-        function getSkynetPortal() {
-            return window.location.hostname;
         }
         function getGunDbName(offset) {
             var epochDay = getEpochDay(offset);
@@ -541,13 +571,11 @@
 </nav>
 
 <br/><br/><br/>
-<div id='history' class='container'></div>
-<div id='comments' class='container'></div>
-<div id='welcome' class='container'>
+<div id='welcome' class='container' style="display: none;">
     <div id="welcome_message" class='row text-success'>
         <div class="col-12 px-2 py-2 border-top">
             <center>
-                <h2>Welcome to your new chat channel.</h2>
+                <h2>Welcome</h2>
                 <div>
                     Click the <a href='#' onclick='clickToChangeSecret()'>Secret</a> menu option to change the current channel secret. Click the <a href='#' onclick='clickToPermalink()'>Permalink</a> menu option at any time to generate a sharable link to your chat channel. This permalink will have the current channel secret embedded in it so that everyone can talk to eachother.
                 </div>
@@ -555,6 +583,8 @@
         </div>
     </div>
 </div>
+<div id='history' class='container'></div>
+<div id='comments' class='container'></div>
 
 <div class="container">
   <div class="modal" id="resultsModal" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static" style="display: none;">
@@ -644,11 +674,17 @@
         </div>
         <div class="modal-body">
           <div class="md-form">
+            <div id="portalKnown" class="input-group mb-3" style="display: block;">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Known</span>
+              </div>
+              <select class="form-control" id="portalSelect"></select>
+            </div>
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text">Portal</span>
               </div>
-              <input id="portal" type="text" class="form-control">
+              <input id="portal" type="text" class="form-control" onclick="document.getElementById('portalKnown').style.display = `none`;">
             </div>
           </div>
         </div>

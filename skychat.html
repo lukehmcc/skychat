@@ -17,15 +17,6 @@
     <script>
         var gun = Gun(['https://mvp-gun.herokuapp.com/gun', 'https://e2eec.herokuapp.com/gun']);
 
-        document.addEventListener("DOMContentLoaded", () => {
-            // add CTRL+Enter keybind
-            document.addEventListener("keydown", (event) => {
-                if (event.key === "Enter" && event.ctrlKey) {
-                    compose();
-                }
-            });
-        });
-
         var commentOffset = 0;
         var latestCommentEpoch = 0;
         const transparentImg = `data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==`
@@ -367,6 +358,7 @@
         function compose() {
             var content = document.getElementById("content").value;
             if (content == null || content.trim().length == 0) {
+                resetTextarea("content");
                 alert("Can not submit empty message.");
             } else if (content.length > 8000) {
                 alert("Message too large.");
@@ -380,14 +372,22 @@
         }
         var originalHeight = null;
         function expandTextarea(id) {
-            document.getElementById(id).addEventListener('keyup', function() {
-                if (originalHeight == null) {
-                    originalHeight = this.scrollHeight + 2;
-                }
-                this.style.overflow = 'hidden';
-                this.style.height = 0;
-                this.style.height = this.scrollHeight > 250 ? '250px' : this.scrollHeight + 'px';
-            }, false);
+            if (originalHeight === null) {
+                document.getElementById(id).addEventListener('keyup', function() {
+                    if (originalHeight == null) {
+                        originalHeight = this.scrollHeight + 2;
+                    }
+                    this.style.overflow = 'hidden';
+                    this.style.height = 0;
+                    this.style.height = this.scrollHeight > 250 ? '250px' : this.scrollHeight + 'px';
+                }, false);
+                document.getElementById(id).addEventListener("keyup", (event) => {
+                    if (event.keyCode == 13 && !event.shiftKey) {
+                        compose();
+                        return false;
+                    }
+                });
+            }
         }
         function resetTextarea(id) {
             var textArea = document.getElementById(id);

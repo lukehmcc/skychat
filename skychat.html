@@ -375,11 +375,7 @@
             }
         }
         function put(content) {
-            if (getSecret() === "plaintext") {
-                alert(`Posting with the chat channel's secret set to "plaintext" has been disabled. Please set the secret to something else.`);
-            } else {
-                gun.get(getGunDbName(0)).put({ [new Date().getTime()]: `${encrypt(getUser())},${encrypt(getContact())},${encrypt(content)}`});
-            }
+            gun.get(getGunDbName(0)).put({ [new Date().getTime()]: `${encrypt(getUser())},${encrypt(getContact())},${encrypt(content)}`});
             resetTextarea('content');
         }
         var originalHeight = null;

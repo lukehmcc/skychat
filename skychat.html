@@ -116,7 +116,6 @@
                     document.getElementById("welcome").innerHTML = "";
                     var gunDbName = getGunDbName(offset);
                     var gunDbComments = document.getElementById(gunDbName);
-                    var atBottom = isWindowAtBottom();
                     if (gunDbComments == null) {
                         if (offset == 0) {
                             document.getElementById("comments").innerHTML += `<div id="${gunDbName}"></div>`;
@@ -125,9 +124,13 @@
                         }
                         gunDbComments = document.getElementById(gunDbName);
                     }
+                    var atTop = isWindowAtTop();
+                    var atBottom = isWindowAtBottom();
                     gunDbComments.innerHTML = commentsHTML;
                     if (atBottom) {
-                        window.scrollTo(0,document.body.scrollHeight);
+                        window.scrollTo(0, document.body.scrollHeight);
+                    } else if (atTop && offset != 0) {
+                        document.getElementById(getGunDbName(offset-1)).scrollIntoView();
                     }
                 }
                 autoLoadMoreComments();
@@ -490,6 +493,9 @@
         }
         function isWindowAtBottom() {
             return (window.innerHeight + window.pageYOffset) > document.body.offsetHeight - 5;
+        }
+        function isWindowAtTop() {
+            return window.pageYOffset < 5;
         }
         function setAvatar() {
             var contact = getContact();

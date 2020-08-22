@@ -80,7 +80,7 @@
                             if (comment.length < 10000) {
                                 var user = decrypt(comment.split(",")[0]);
                                 if (!user) {
-                                    user = `<i>Anonomous</i>`
+                                    user = `<i>Anonymous</i>`
                                 } else if (user.length > 35) {
                                     user = user.substring(0, 35) + `…`;
                                 }
@@ -344,8 +344,8 @@
                 $("#resultsModal").modal("hide");
             }
         }
-        function anonomous_login() {
-            setUser("Anonomous");
+        function anonymous_login() {
+            setUser("Anonymous");
             setContact("");
             $("#resultsModal").modal("hide");
         }
@@ -610,7 +610,7 @@
         <div class="modal-footer bg-success">
           <div id='login-trigger-container' style="display: block;">
             <button type='button' class="btn btn-secondary" onclick='login()'>Submit</button>
-            <button type='button' class="btn btn-secondary" onclick='anonomous_login()'>Skip</button>
+            <button type='button' class="btn btn-secondary" onclick='anonymous_login()'>Skip</button>
           </div>
           <div id='login-loading-container' style="display: none;">
             <div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>

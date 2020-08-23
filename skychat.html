@@ -458,7 +458,9 @@
             if (typeof(localDb[theGunDbName]) == "undefined") {
                 localDb[theGunDbName] = {};
             }
+            localDb[theGunDbName].shouldArchive = true;
             localDb[theGunDbName][theEpoch] = theEncryptedContent;
+            loadComments(0);
             getGunDb(theGunDbName).put({ [theEpoch] : theEncryptedContent});
             resetTextarea('content');
         }

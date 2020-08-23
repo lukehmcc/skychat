@@ -37,6 +37,7 @@
                 initiateWelcomeMessage();
                 initiateNetworkAndComments();
                 initiatePortals();
+                initiateCommentArchiving();
                 setAvatar();
                 window.scrollTo(0,document.body.scrollHeight);
                 if (getUser() === null) {
@@ -124,7 +125,7 @@
         function initiateComments(offset) {
             const theGunDbName = getGunDbName(offset);
             if (typeof(localDb[theGunDbName]) == "undefined") {
-                localDb[theGunDbName] = {};
+                localDb[theGunDbName] = {shouldArchive: false};
             }
             const pin = localStorage.getItem(theGunDbName);
             if (pin !== null) {
@@ -178,31 +179,37 @@
                         }
                     }
                 };
+                localDb[theGunDbName].shouldArchive = shouldArchive;
                 loadComments(offset);
-                if (shouldArchive) {
-                    archiveComments(offset);
-                }
                 autoLoadMoreComments();
             })
         }
+        function initiateCommentArchiving() {
+            setTimeout(() => {archiveComments(0)}, 1000 * 10);
+            setInterval(() => {archiveComments(0)}, 1000 * 60 * 5);
+        }
         function archiveComments(offset) {
-            var shouldArchive;
-            var theGunDbName;
-            if (offset != 0) {
-                theGunDbName = getGunDbName(offset);
-                shouldArchive = typeof(localDb[theGunDbName]) != "undefined";
-            } else {
-                theGunDbName = getGunDbName(1);
-                shouldArchive = typeof(localDb[theGunDbName]) != "undefined" && localStorage.getItem(theGunDbName) === null;
-            }
-            if (shouldArchive) {
-                const blob = new Blob([JSON.stringify(localDb[theGunDbName])],{ type: 'application/json' });
-                var formData = new FormData();
-                formData.append('file', blob);
-                fetch(`${getUploadPath(getNetwork())}${randomString(26)}?filename=${randomString(26)}.json`, {method: 'POST',body: formData})
-                    .then(response => response.json())
-                    .then(result => {localStorage.setItem(theGunDbName, result[getUploadResponseKey(getNetwork())])})
-                    .catch(error => {console.log(error)});
+            var theGunDbName = getGunDbName(offset);
+            if (typeof(localDb[theGunDbName]) != "undefined") {
+                if (!localDb[theGunDbName].shouldArchive) {
+                    if (theGunDbName !== getGunDbName(offset + 1)) {
+                        setTimeout(() => {archiveComments(offset + 1)}, 1000);
+                    }
+                } else {
+                    const blob = new Blob([JSON.stringify(localDb[theGunDbName])],{ type: 'application/json' });
+                    var formData = new FormData();
+                    formData.append('file', blob);
+                    fetch(`${getUploadPath(getNetwork())}${randomString(26)}?filename=${randomString(26)}.json`, {method: 'POST',body: formData})
+                        .then(response => response.json())
+                        .then(result => {
+                            localStorage.setItem(theGunDbName, result[getUploadResponseKey(getNetwork())]);
+                            localDb[theGunDbName].shouldArchive = false;
+                            if (theGunDbName !== getGunDbName(offset + 1)) {
+                                setTimeout(() => {archiveComments(offset + 1)}, 1000);
+                            }
+                        })
+                        .catch(error => {console.log(error)});
+                }
             }
         }
         function getComment(i, user, epoch, image, message) {

@@ -179,7 +179,9 @@
                         }
                     }
                 };
-                localDb[theGunDbName].shouldArchive = shouldArchive;
+                if (shouldArchive) {
+                    localDb[theGunDbName].shouldArchive = shouldArchive;
+                }
                 loadComments(offset);
                 autoLoadMoreComments();
             })

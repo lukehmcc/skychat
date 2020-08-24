@@ -20,20 +20,22 @@
                 getSecret(); //sets the secret into localStorage
                 window.location.href = [window.location.protocol, '//', window.location.hostname, window.location.pathname].join('');
             } else {
-                const scriptLocation = `https://skyportal.xyz/bADzxPBQMqIQiM7TaFZ4F_oNzTvUMmUd-Jh-zzGFB-kQKQ/`;
+                $.ajaxSetup({
+                    cache: true
+                });
                 $.when(
-                    $.getScript(`${scriptLocation}archive_comments.js`),
-                    $.getScript(`${scriptLocation}comments.js`),
-                    $.getScript(`${scriptLocation}crypto.js`),
-                    $.getScript(`${scriptLocation}modal/compose.js`),
-                    $.getScript(`${scriptLocation}modal/login.js`),
-                    $.getScript(`${scriptLocation}modal/modal.js`),
-                    $.getScript(`${scriptLocation}modal/new_chat.js`),
-                    $.getScript(`${scriptLocation}modal/permalink.js`),
-                    $.getScript(`${scriptLocation}modal/portal.js`),
-                    $.getScript(`${scriptLocation}modal/upload.js`),
-                    $.getScript(`${scriptLocation}initiate.js`),
-                    $.getScript(`${scriptLocation}skychat.js`),
+                    $.getScript(`js/archive_comments.js`),
+                    $.getScript(`js/comments.js`),
+                    $.getScript(`js/crypto.js`),
+                    $.getScript(`js/main.js`),
+                    $.getScript(`js/modal/compose.js`),
+                    $.getScript(`js/modal/login.js`),
+                    $.getScript(`js/modal/modal.js`),
+                    $.getScript(`js/modal/new_chat.js`),
+                    $.getScript(`js/modal/permalink.js`),
+                    $.getScript(`js/modal/portal.js`),
+                    $.getScript(`js/modal/upload.js`),
+                    $.getScript(`js/initiate.js`),
                     $.Deferred(function( deferred ){
                         $( deferred.resolve );
                     })

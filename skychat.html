@@ -62,7 +62,7 @@
         function initiateNetworkAndComments() {
             var formData = new FormData();
             formData.append('file', new Blob([""],{ type: 'text/html' }));
-            fetch(`${getUploadPath("sia")}${randomString(26)}?dryrun=true&filename=exists.query`, {method: 'POST',body: formData})
+            fetch(`${getUploadPath("sia")}${getRandomString(26)}?dryrun=true&filename=exists.query`, {method: 'POST',body: formData})
                 .then(response => response.json())
                 .then(result => {
                     setNetwork(`sia`);
@@ -258,7 +258,7 @@
                     const blob = new Blob([JSON.stringify(localDb[theGunDbName])],{ type: 'application/json' });
                     var formData = new FormData();
                     formData.append('file', blob);
-                    fetch(`${getUploadPath(getNetwork())}${randomString(26)}?filename=${randomString(26)}.json`, {method: 'POST',body: formData})
+                    fetch(`${getUploadPath(getNetwork())}${getRandomString(26)}?filename=${getRandomString(26)}.json`, {method: 'POST',body: formData})
                         .then(response => response.json())
                         .then(result => {
                             localStorage.setItem(theGunDbName, result[getUploadResponseKey(getNetwork())]);
@@ -315,14 +315,6 @@
                 initiateComments(commentOffset);
             }
         }
-        function randomString(len) {
-            let uuid = '';
-            const cs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            for (let i = 0; i < len; i++) {
-                uuid += cs.charAt(Math.floor(Math.random() * cs.length));
-            };
-            return uuid;
-        }
         function showModal(selection) {
             const modalIds = ["upload_modal", "login_modal", "secret_modal", "portal_modal", "new_chat_modal", "permalink_modal"];
             modalIds.forEach(modalId => {
@@ -356,7 +348,7 @@
             fetch(`/${pin}/`)
                 .then(response => response.text())
                 .then(result => {
-                    const host = `${randomString(26)}`;
+                    const host = `${getRandomString(26)}`;
                     const skychatDiv = `<skychat id="skychat_host" style="display: none">`;
                     const endingIndex = result.lastIndexOf(skychatDiv);
                     const newPage = result.substring(0, endingIndex) 
@@ -383,7 +375,7 @@
             const blob = new Blob([newPage],{ type: 'text/html' });
             var formData = new FormData();
             formData.append('file', blob);
-            fetch(`${getUploadPath(getNetwork())}${randomString(26)}?filename=permalink.html`, {method: 'POST',body: formData})
+            fetch(`${getUploadPath(getNetwork())}${getRandomString(26)}?filename=permalink.html`, {method: 'POST',body: formData})
                 .then(response => response.json())
                 .then(result => {
                     document.getElementById("permalink").innerHTML = `<a href="/${result[getUploadResponseKey(getNetwork())]}/">${result[getUploadResponseKey(getNetwork())]}</a>`;
@@ -403,7 +395,7 @@
             var formData = new FormData();
             formData.append('file', new Blob([""],{ type: 'text/html' }));
             const thePortal = `${window.location.protocol}//${document.getElementById('portal').value}`;
-            fetch(`${thePortal}${getUploadPath(getNetwork())}${randomString(26)}?dryrun=true&filename=exists.query`, {method: 'POST',body: formData})
+            fetch(`${thePortal}${getUploadPath(getNetwork())}${getRandomString(26)}?dryrun=true&filename=exists.query`, {method: 'POST',body: formData})
                 .then(response => response.json())
                 .then(result => {
                     window.location.href = `${thePortal}/${window.location.pathname.substring(1, 47)}/?secret=${getSecret()}`;
@@ -436,7 +428,7 @@
             var file = document.getElementById('upload').files[0];
             if (file != null) {
                 $.ajax({
-                    url: `${getUploadPath(getNetwork())}${randomString(26)}?filename=${file.name}`,
+                    url: `${getUploadPath(getNetwork())}${getRandomString(26)}?filename=${file.name}`,
                     type: 'POST',
                     data: file,
                     mimeType: "multipart/form-data",
@@ -465,7 +457,7 @@
             var file = document.getElementById('contact').files[0];
             if (file != null) {
                 $.ajax({
-                    url: `${getUploadPath(getNetwork())}${randomString(26)}?filename=${file.name}`,
+                    url: `${getUploadPath(getNetwork())}${getRandomString(26)}?filename=${file.name}`,
                     type: 'POST',
                     data: file,
                     mimeType: "multipart/form-data",
@@ -562,7 +554,7 @@
             return network === `sia` ? `skylink` : `publink`;
         }
         function putPortal(portal) {
-            getGunDb(getGunDbName(0) + "_portals").put({ [encrypt(portal)]: `${randomString(26)}`});
+            getGunDb(getGunDbName(0) + "_portals").put({ [encrypt(portal)]: `${getRandomString(26)}`});
         }
         function getPortal() {
             return window.location.hostname;
@@ -578,7 +570,7 @@
             if (theSecret) {
                 localStorage.setItem(getHost() + "_secret", theSecret);
             } else if (localStorage.getItem(getHost() + "_secret") === null){
-                localStorage.setItem(getHost() + "_secret", randomString(26));
+                localStorage.setItem(getHost() + "_secret", getRandomString(26));
             }
             return localStorage.getItem(getHost() + "_secret");
         }
@@ -619,18 +611,25 @@
         }
         function getEpochDay(offset) {
             return Math.round(new Date().getTime()/86400000) - offset;
+        }        function setAvatar() {
+            var contact = getContact();
+            var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
+            var contactImg = contact !== null && pinRegex.test(contact) ? `/${contact}/` : anonymousImg;
+            document.getElementById("avatar").src = contactImg;
+        }
+        function getRandomString(len) {
+            let uuid = '';
+            const cs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            for (let i = 0; i < len; i++) {
+                uuid += cs.charAt(Math.floor(Math.random() * cs.length));
+            };
+            return uuid;
         }
         function isWindowAtBottom() {
             return (window.innerHeight + window.pageYOffset) > document.body.offsetHeight - 5;
         }
         function isWindowAtTop() {
             return window.pageYOffset < 5;
-        }
-        function setAvatar() {
-            var contact = getContact();
-            var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
-            var contactImg = contact !== null && pinRegex.test(contact) ? `/${contact}/` : anonymousImg;
-            document.getElementById("avatar").src = contactImg;
         }
     </script>
 </head>

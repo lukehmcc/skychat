@@ -611,7 +611,8 @@
         }
         function getEpochDay(offset) {
             return Math.round(new Date().getTime()/86400000) - offset;
-        }        function setAvatar() {
+        }
+        function setAvatar() {
             var contact = getContact();
             var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
             var contactImg = contact !== null && pinRegex.test(contact) ? `/${contact}/` : anonymousImg;

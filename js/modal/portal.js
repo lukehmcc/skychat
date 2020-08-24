@@ -1,0 +1,33 @@
+function portal() {
+    document.getElementById('portal-trigger-container').style.display = `none`;
+    document.getElementById('portal-loading-container').style.display = `block`;
+    var formData = new FormData();
+    formData.append('file', new Blob([""],{ type: 'text/html' }));
+    const thePortal = `${window.location.protocol}//${document.getElementById('portal').value}`;
+    fetch(`${thePortal}${getUploadPath(getNetwork())}${getRandomString(26)}?dryrun=true&filename=exists.query`, {method: 'POST',body: formData})
+        .then(response => response.json())
+        .then(result => {
+            window.location.href = `${thePortal}/${window.location.pathname.substring(1, 47)}/?secret=${getSecret()}`;
+        })
+        .catch(error => {
+            const pin = window.location.pathname.substring(1, 47);
+            fetch(`/${pin}/`)
+                .then(response => response.text())
+                .then(result => {
+                    var theNetwork = getNetwork() == "sia" ? "prime" : "sia";
+                    var formData = new FormData();
+                    formData.append('file', new Blob([result],{ type: 'text/html' }));
+                    fetch(`${thePortal}${getUploadPath(theNetwork)}${getHost()}?filename=skychat.html&force=true`, {method: 'POST',body: formData})
+                        .then(response => response.json())
+                        .then(result => {
+                            window.location.href = `${thePortal}/${result[getUploadResponseKey(theNetwork)]}/?secret=${getSecret()}`;
+                        })
+                        .catch(error => {
+                            document.getElementById('portal-trigger-container').style.display = `block`;
+                            document.getElementById('portal-loading-container').style.display = `none`;
+                            alert(`Unable to chang portal to ${thePortal}`);
+                            console.error('Error:', error)
+                        });
+                })
+        });
+}

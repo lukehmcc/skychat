@@ -319,7 +319,10 @@
             const modalIds = ["upload_modal", "login_modal", "secret_modal", "portal_modal", "new_chat_modal", "permalink_modal"];
             modalIds.forEach(modalId => {
                 var modalDisplay = modalId === selection ? "block" : "none";
-                document.getElementById(modalId).style.display = modalDisplay;
+                var theElement = document.getElementById(modalId);
+                if (theElement !== null) {
+                    theElement.style.display = modalDisplay;
+                }
             });
             $("#resultsModal").modal("show");
         }

@@ -1,4 +1,7 @@
+var gun;
+
 function initiate() {
+    initiateGunDb();
     initiateCommentContainers();
     initiateWelcomeMessage();
     initiateNetworkAndComments();
@@ -9,6 +12,9 @@ function initiate() {
     if (getUser() === null) {
         clickToLogin();
     }
+}
+function initiateGunDb() {
+    gun = Gun(['https://mvp-gun.herokuapp.com/gun', 'https://e2eec.herokuapp.com/gun']);
 }
 function initiateCommentContainers() {
     var epochDifference = getEpochDay(0) - getEpoch() + 1;

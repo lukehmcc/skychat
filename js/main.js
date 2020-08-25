@@ -1,4 +1,3 @@
-var gun = Gun(['https://mvp-gun.herokuapp.com/gun', 'https://e2eec.herokuapp.com/gun']);
 var gunDb = {};
 var localDb = {};
 

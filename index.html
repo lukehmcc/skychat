@@ -15,60 +15,79 @@
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/not.js" integrity="sha384-1tPi3AL7O+RyZptCFmnrEiZ41GSY27D0p38b9R31mJ8fjOAYCjvcrrciqFgIcnNC" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js" integrity="sha384-TTjj1KxpUMxMChPbgmSWLlfEep0/67X86v9lnJMkldzkQGHZNAhZRgE9owovIRyz" crossorigin="anonymous"></script>
     <script>
-        window.onload = function() {
-            if (new URLSearchParams(window.location.search).get(`secret`) !== null) {
-                getSecret(); //sets the secret into localStorage
-                window.location.href = [window.location.protocol, '//', window.location.hostname, window.location.pathname].join('');
-            } else {
-                $.ajaxSetup({
-                    cache: true
-                });
-                $.when(
-                    $.getScript(`js/archive_comments.js`),
-                    $.getScript(`js/comments.js`),
-                    $.getScript(`js/crypto.js`),
-                    $.getScript(`js/main.js`),
-                    $.getScript(`js/modal/compose.js`),
-                    $.getScript(`js/modal/login.js`),
-                    $.getScript(`js/modal/modal.js`),
-                    $.getScript(`js/modal/new_chat.js`),
-                    $.getScript(`js/modal/permalink.js`),
-                    $.getScript(`js/modal/portal.js`),
-                    $.getScript(`js/modal/upload.js`),
-                    $.getScript(`js/initiate.js`),
-                    $.Deferred(function( deferred ){
-                        $( deferred.resolve );
+const scripts = [
+    "js/archive_comments.js",
+    "js/comments.js",
+    "js/crypto.js",
+    "js/main.js",
+    "js/modal/compose.js",
+    "js/modal/login.js",
+    "js/modal/modal.js",
+    "js/modal/new_chat.js",
+    "js/modal/permalink.js",
+    "js/modal/portal.js",
+    "js/modal/upload.js",
+    "js/initiate.js"
+];
+var compiledScripts = "";
+window.onload = function() {
+    if (new URLSearchParams(window.location.search).get(`secret`) !== null) {
+        getSecret(); //sets the secret into localStorage
+        window.location.href = [window.location.protocol, '//', window.location.hostname, window.location.pathname].join('');
+    } else if(compiledScripts === "") {
+        document.getElementById("intalling_skychat").style.display = "block";
+        initiateScripts(0);
+    } else {
+        initiate();
+    }
+}
+function initiateScripts(i) {
+    if (i < scripts.length) {
+        $.get(scripts[i], function(data){
+            compiledScripts += "\n" + data + "\n";
+            initiateScripts(i + 1);
+        });
+    } else {
+        $.globalEval(compiledScripts);
+        initiateNetwork();
+        fetch(`index.html`)
+            .then(response => response.text())
+            .then(result => {
+                const search = `var compiledScripts = "";`;
+                const index = result.indexOf(search);
+                const newPage = result.substring(0, index) + compiledScripts + `var compiledScripts = "1";` + result.substring(index + 25, result.length);
+                const blob = new Blob([newPage],{ type: 'text/html' });
+                var formData = new FormData();
+                formData.append('file', blob, 'index.html');
+                fetch(`${getUploadPath(getNetwork())}${getHost()}?filename=index.html&force=true`, {method: 'POST',body: formData})
+                    .then(response => response.json())
+                    .then(result => {
+                        window.location.pathname = `/${result[getUploadResponseKey(getNetwork())]}/`;
                     })
-                ).done(function(){
-                    initiate();
-                    setAvatar();
-                    window.scrollTo(0,document.body.scrollHeight);
-                    if (getUser() === null) {
-                        clickToLogin();
-                    }
-                });
-            }
-        }
-        function getHost() {
-            return document.getElementById("skychat_host").innerHTML;
-        }
-        function getSecret() {
-            var theSecret = new URLSearchParams(window.location.search).get(`secret`);
-            if (theSecret) {
-                localStorage.setItem(getHost() + "_secret", theSecret);
-            } else if (localStorage.getItem(getHost() + "_secret") === null){
-                localStorage.setItem(getHost() + "_secret", getRandomString(26));
-            }
-            return localStorage.getItem(getHost() + "_secret");
-        }
-        function getRandomString(len) {
-            let uuid = '';
-            const cs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            for (let i = 0; i < len; i++) {
-                uuid += cs.charAt(Math.floor(Math.random() * cs.length));
-            };
-            return uuid;
-        }
+                    .catch(error => {console.error('Error:', error)});
+            })
+    }
+}
+function getHost() {
+    return document.getElementById("skychat_host").innerHTML;
+}
+function getSecret() {
+    var theSecret = new URLSearchParams(window.location.search).get(`secret`);
+    if (theSecret) {
+        localStorage.setItem(getHost() + "_secret", theSecret);
+    } else if (localStorage.getItem(getHost() + "_secret") === null){
+        localStorage.setItem(getHost() + "_secret", getRandomString(26));
+    }
+    return localStorage.getItem(getHost() + "_secret");
+}
+function getRandomString(len) {
+    let uuid = '';
+    const cs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < len; i++) {
+        uuid += cs.charAt(Math.floor(Math.random() * cs.length));
+    };
+    return uuid;
+}
     </script>
 </head>
 <body class="bg-dark text-white">
@@ -111,6 +130,18 @@
 </nav>
 
 <br/><br/><br/>
+<div id='intalling_skychat' class='container' style="display: none;">
+    <div class='row text-success'>
+        <div class="col-12 px-2 py-2 border-top">
+            <center>
+                <h2>Installing Skychat</h2>
+                <div>
+                    <div class="spinner-border" role="status"><span class="sr-only">In Progress...</span></div>
+                </div>
+            </center>
+        </div>
+    </div>
+</div>
 <div id='welcome' class='container' style="display: none;">
     <div id="welcome_message" class='row text-success'>
         <div class="col-12 px-2 py-2 border-top">

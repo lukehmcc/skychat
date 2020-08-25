@@ -3,7 +3,12 @@ function initiate() {
     initiateWelcomeMessage();
     initiateNetworkAndComments();
     initiatePortals();
-    initiateCommentArchiving();    
+    initiateCommentArchiving();
+    setAvatar();
+    window.scrollTo(0,document.body.scrollHeight);
+    if (getUser() === null) {
+        clickToLogin();
+    }
 }
 function initiateCommentContainers() {
     var epochDifference = getEpochDay(0) - getEpoch() + 1;
@@ -21,6 +26,18 @@ function initiateWelcomeMessage() {
     if (getEpochDay(0) - getEpoch() <= 1) {
         document.getElementById("welcome").style.display = "block";
     }
+}
+function initiateNetwork() {
+    var formData = new FormData();
+    formData.append('file', new Blob([""],{ type: 'text/html' }));
+    fetch(`${getUploadPath("sia")}${getRandomString(26)}?dryrun=true&filename=exists.query`, {method: 'POST',body: formData})
+        .then(response => response.json())
+        .then(result => {
+            setNetwork(`sia`);
+        })
+        .catch(error => {
+            setNetwork(`prime`);
+        });
 }
 function initiateNetworkAndComments() {
     var formData = new FormData();

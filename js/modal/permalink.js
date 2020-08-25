@@ -8,8 +8,8 @@ function clickToPermalink() {
         + `</` + `script>`;
     const blob = new Blob([newPage],{ type: 'text/html' });
     var formData = new FormData();
-    formData.append('file', blob);
-    fetch(`${getUploadPath(getNetwork())}${getRandomString(26)}?filename=permalink.html`, {method: 'POST',body: formData})
+    formData.append('file', blob, 'index.html');
+    fetch(`${getUploadPath(getNetwork())}${getRandomString(26)}?filename=permalink.html&force=true`, {method: 'POST',body: formData})
         .then(response => response.json())
         .then(result => {
             document.getElementById("permalink").innerHTML = `<a href="/${result[getUploadResponseKey(getNetwork())]}/">${result[getUploadResponseKey(getNetwork())]}</a>`;

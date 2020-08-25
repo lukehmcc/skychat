@@ -63,12 +63,6 @@ function putPortal(portal) {
 function getPortal() {
     return window.location.hostname;
 }
-function getEpoch() {
-    return Number(document.getElementById("skychat_epoch").innerHTML);
-}
-function setSecret(secret) {
-    localStorage.setItem(getHost() + "_secret", secret);
-}
 function getUser() {
     return localStorage.getItem(getHost() + "_user");
 }

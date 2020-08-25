@@ -34,6 +34,17 @@ window.onload = function() {
     if (new URLSearchParams(window.location.search).get(`secret`) !== null) {
         getSecret(); //sets the secret into localStorage
         window.location.href = [window.location.protocol, '//', window.location.hostname, window.location.pathname].join('');
+    } else if (new URLSearchParams(window.location.search).get(`compile`) === `false`) {
+        $.ajaxSetup({
+            cache: true
+        });
+        var scriptRequests = new Array();
+        for (var i = 0; i < scripts.length; i++) {
+            scriptRequests.push($.getScript(scripts[i]));
+        }
+        $.when.apply($, scriptRequests).done(function() {
+            initiate();
+        });
     } else if(compiledScripts === "") {
         document.getElementById("intalling_skychat").style.display = "block";
         initiateScripts(0);

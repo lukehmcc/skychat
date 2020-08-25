@@ -38,6 +38,13 @@ window.onload = function() {
         $.ajaxSetup({
             cache: true
         });
+        fetch(`settings.json`)
+            .then(response => response.json())
+            .then(result => {
+                setHost(result.host);
+                setSecret(result.secret);
+                setEpoch(result.epoch_day);
+            });
         var scriptRequests = new Array();
         for (var i = 0; i < scripts.length; i++) {
             scriptRequests.push($.getScript(scripts[i]));
@@ -46,6 +53,13 @@ window.onload = function() {
             initiate();
         });
     } else if(compiledScripts === "") {
+        fetch(`settings.json`)
+            .then(response => response.json())
+            .then(result => {
+                setHost(result.host);
+                setSecret(result.secret);
+                setEpoch(result.epoch_day);
+            });
         document.getElementById("intalling_skychat").style.display = "block";
         initiateScripts(0);
     } else {
@@ -65,8 +79,19 @@ function initiateScripts(i) {
             .then(response => response.text())
             .then(result => {
                 const search = `var compiledScripts = "";`;
-                const index = result.indexOf(search);
-                const newPage = result.substring(0, index) + compiledScripts + `var compiledScripts = "1";` + result.substring(index + 25, result.length);
+                const scriptIndex = result.indexOf(search);
+                const hostDiv = `<skychat id="skychat_host" style="display: none">`;
+                const hostIndex = result.lastIndexOf(hostDiv);                
+                const newPage = result.substring(0, scriptIndex) 
+                    + compiledScripts 
+                    + `var compiledScripts = "1";` 
+                    + result.substring(scriptIndex + 25, hostIndex)
+                    + hostDiv
+                    + getHost()
+                    + `</skychat>`
+                    + `<skychat id="skychat_epoch" style="display: none">`
+                    + getEpoch()
+                    + `</skychat></body></html>`;
                 const blob = new Blob([newPage],{ type: 'text/html' });
                 var formData = new FormData();
                 formData.append('file', blob, 'index.html');
@@ -82,6 +107,9 @@ function initiateScripts(i) {
 function getHost() {
     return document.getElementById("skychat_host").innerHTML;
 }
+function setHost(theHost) {
+    return document.getElementById("skychat_host").innerHTML = theHost;
+}
 function getSecret() {
     var theSecret = new URLSearchParams(window.location.search).get(`secret`);
     if (theSecret) {
@@ -90,6 +118,15 @@ function getSecret() {
         localStorage.setItem(getHost() + "_secret", getRandomString(26));
     }
     return localStorage.getItem(getHost() + "_secret");
+}
+function setSecret(secret) {
+    localStorage.setItem(getHost() + "_secret", secret);
+}
+function getEpoch() {
+    return Number(document.getElementById("skychat_epoch").innerHTML);
+}
+function setEpoch(epoch) {
+    document.getElementById("skychat_epoch").innerHTML = epoch;
 }
 function getRandomString(len) {
     let uuid = '';
@@ -333,6 +370,6 @@ function getRandomString(len) {
 
 <br/><br/><br/>
 <skychat id="skychat"></skychat>
-<skychat id="skychat_host" style="display: none">ghdsfgjdshfkjdhas.sns</skychat>
-<skychat id="skychat_epoch" style="display: none">18490</skychat>
+<skychat id="skychat_host" style="display: none"></skychat>
+<skychat id="skychat_epoch" style="display: none"></skychat>
 </body></html>

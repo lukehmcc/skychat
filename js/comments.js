@@ -21,7 +21,7 @@ function loadComments(offset) {
                 var key = keys[i];
                 if (epochRegex.test(key) && Number(key) < new Date().getTime()) {
                     var comment = localDb[theGunDbName][key];
-                    if (comment.length < 20000) {
+                    if (comment.length < 22000) {
                         var user = decrypt(comment.split(",")[0]);
                         if (!user) {
                             user = `<i>Anonymous</i>`

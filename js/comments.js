@@ -22,8 +22,6 @@ function loadComments(offset) {
                 if (epochRegex.test(key) && Number(key) < new Date().getTime()) {
                     var comment = localDb[theGunDbName][key].split(",");
                     if (comment.length > 2 && comment[2].length < 22000) {
-                        console.log("getChannels()[0]: " + getChannels()[0]);
-                        console.log("getChannel(): " + getChannel());
                         var channel = comment.length > 3 ? decrypt(comment[3]) : "";
                         if (channel === getChannel()) {
                             var user = decrypt(comment[0]);

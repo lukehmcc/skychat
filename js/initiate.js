@@ -2,6 +2,7 @@ var gun;
 
 function initiate() {
     initiateGunDb();
+    initiateChannels();
     initiateCommentContainers();
     initiateWelcomeMessage();
     initiateNetworkAndComments();
@@ -14,7 +15,15 @@ function initiate() {
     }
 }
 function initiateGunDb() {
-    gun = Gun(['https://mvp-gun.herokuapp.com/gun', 'https://e2eec.herokuapp.com/gun']);
+    gun = Gun({peers:['https://mvp-gun.herokuapp.com/gun', 'https://e2eec.herokuapp.com/gun'], localStorage: false});
+}
+function initiateChannels() {
+    var theChannels = getChannels();
+    for (var i = 0; i < theChannels.length; i++) {
+        var theChannel = theChannels[i];
+        var onClickAction = `setChannel('${i == 0 ? "" : theChannel}');window.location = window.location;`
+        document.getElementById("channels").innerHTML += `<li class="nav-item"><button type="button" class="btn btn-link text-white" onclick="${onClickAction}">#${theChannel}</button></li>`;
+    }
 }
 function initiateCommentContainers() {
     var epochDifference = getEpochDay(0) - getEpoch() + 1;

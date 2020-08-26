@@ -20,26 +20,31 @@ function loadComments(offset) {
             try {
                 var key = keys[i];
                 if (epochRegex.test(key) && Number(key) < new Date().getTime()) {
-                    var comment = localDb[theGunDbName][key];
-                    if (comment.length < 22000) {
-                        var user = decrypt(comment.split(",")[0]);
-                        if (!user) {
-                            user = `<i>Anonymous</i>`
-                        } else if (user.length > 35) {
-                            user = user.substring(0, 35) + `…`;
-                        }
-                        var epoch = key;
-                        var contact = decrypt(comment.split(",")[1]);
-                        var contactImg = "";
-                        var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
-                        if (pinRegex.test(contact)) {
-                            contactImg = `/${contact}/`;
-                        } else {
-                            contactImg = anonymousImg
-                        }
-                        var content = new showdown.Converter().makeHtml(decrypt(comment.split(",")[2]).replace("![", "! ["));
-                        if (content) {
-                            commentsHTML = getComment(i, user, epoch, contactImg, content) + commentsHTML;
+                    var comment = localDb[theGunDbName][key].split(",");
+                    if (comment.length > 2 && comment[2].length < 22000) {
+                        console.log("getChannels()[0]: " + getChannels()[0]);
+                        console.log("getChannel(): " + getChannel());
+                        var channel = comment.length > 3 ? decrypt(comment[3]) : "";
+                        if (channel === getChannel()) {
+                            var user = decrypt(comment[0]);
+                            if (!user) {
+                                user = `<i>Anonymous</i>`
+                            } else if (user.length > 35) {
+                                user = user.substring(0, 35) + `…`;
+                            }
+                            var epoch = key;
+                            var contact = decrypt(comment[1]);
+                            var contactImg = "";
+                            var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
+                            if (pinRegex.test(contact)) {
+                                contactImg = `/${contact}/`;
+                            } else {
+                                contactImg = anonymousImg
+                            }
+                            var content = new showdown.Converter().makeHtml(decrypt(comment[2]).replace("![", "! ["));
+                            if (content) {
+                                commentsHTML = getComment(i, user, epoch, contactImg, content) + commentsHTML;
+                            }
                         }
                     }
                 }

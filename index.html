@@ -77,12 +77,10 @@ const scripts = [
     "js/modal/upload.js",
     "js/initiate.js"
 ];
+var secret = null;
 var compiledScripts = "";
 window.onload = function() {
-    if (new URLSearchParams(window.location.search).get(`secret`) !== null) {
-        getSecret(); //sets the secret into localStorage
-        window.location.href = [window.location.protocol, '//', window.location.hostname, window.location.pathname].join('');
-    } else if (new URLSearchParams(window.location.search).get(`compile`) === `false`) {
+    if (new URLSearchParams(location.search).get(`compile`) === `false`) {
         $.ajaxSetup({
             cache: true
         });
@@ -152,7 +150,7 @@ function initiateScripts(i) {
                 fetch(`${getUploadPath(getNetwork())}${getHost()}?filename=index.html&force=true`, {method: 'POST',body: formData})
                     .then(response => response.json())
                     .then(result => {
-                        window.location.pathname = `/${result[getUploadResponseKey(getNetwork())]}/`;
+                        location.href = `${location.protocol}//${location.hostname}/${result[getUploadResponseKey(getNetwork())]}/?secret=${getSecret()}`;
                     })
                     .catch(error => {console.error('Error:', error)});
             })
@@ -165,16 +163,16 @@ function setHost(theHost) {
     return document.getElementById("skychat_host").innerHTML = theHost;
 }
 function getSecret() {
-    var theSecret = new URLSearchParams(window.location.search).get(`secret`);
+    var theSecret = new URLSearchParams(location.search).get(`secret`);
     if (theSecret) {
-        localStorage.setItem(getHost() + "_secret", theSecret);
-    } else if (localStorage.getItem(getHost() + "_secret") === null){
-        localStorage.setItem(getHost() + "_secret", getRandomString(26));
+        setSecret(theSecret);
+    } else if (secret === null){
+        setSecret(getRandomString(26));
     }
-    return localStorage.getItem(getHost() + "_secret");
+    return secret;
 }
-function setSecret(secret) {
-    localStorage.setItem(getHost() + "_secret", secret);
+function setSecret(theSecret) {
+    secret = theSecret;
 }
 function getEpoch() {
     return Number(document.getElementById("skychat_epoch").innerHTML);
@@ -339,27 +337,6 @@ function getRandomString(len) {
           </div>
           <div id='login-loading-container' style="display: none;">
             <div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>
-          </div>
-        </div>
-      </div>
-      <div id="secret_modal" class="modal-content" style="display: none;">
-        <div class="modal-header bg-success">
-          <h5 class="modal-title">Chat Channel Secret</h5>
-        </div>
-        <div class="modal-body">
-          <div class="md-form">
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text">Secret</span>
-              </div>
-              <input id="secret" type="text" class="form-control">
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer bg-success">
-          <div>
-            <button type='button' class="btn btn-secondary" onclick='secret()'>Set</button>
-            <button type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
           </div>
         </div>
       </div>

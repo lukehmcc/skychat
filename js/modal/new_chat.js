@@ -1,6 +1,5 @@
 function newChat() {
     showModal("new_chat_modal");
-    const pin = window.location.pathname.substring(1, 47);
     fetch(`index.html`)
         .then(response => response.text())
         .then(result => {
@@ -18,7 +17,7 @@ function newChat() {
             fetch(`${getUploadPath(getNetwork())}${host}?filename=skychat.html&force=true`, {method: 'POST',body: formData})
                 .then(response => response.json())
                 .then(result => {
-                    window.location.pathname = `/${result[getUploadResponseKey(getNetwork())]}/`;
+                    top.window.location.href = `https://${top.window.location.hostname}/${result[getUploadResponseKey(getNetwork())]}/?secret=${getRandomString(26)}`;
                 })
                 .catch(error => {console.error('Error:', error)});
         })

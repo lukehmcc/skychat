@@ -6,7 +6,7 @@ Skychat is a chat application that runs on top of [Skynet](https://github.com/Ne
 
 ## Public Example
 
-https://skyportal.xyz/AADl_W6qq2Syeqw828B87jpc4SiUD7x9roiMiYDXpHCjrw/
+https://skyportal.xyz/AAAEurngXGTXXLeVEzu3MOQhnHV3ZaF5RMh3Kpe4Xv4ltg/
 
 ## Deployment
 

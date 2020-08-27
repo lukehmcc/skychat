@@ -2,5 +2,5 @@
     "host": "ghdsfgjdshfkjdhas.sns",
     "secret": "d1BuPxgvbbAiyRjE",
     "epoch_day": "18490",
-    "channels": ["general", "help", "renters", "miners", "contributors", "skynet", "core-dev", "app-dev", "trading"]
+    "channels": ["general", "help", "renters", "miners", "contributors", "skynet", "core-dev", "app-dev", "trading", "random"]
 }

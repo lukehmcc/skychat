@@ -11,7 +11,7 @@ function compose() {
 function put(content) {
     const theGunDbName = getGunDbName(0);
     const theEpoch = new Date().getTime();
-    const theEncryptedContent = `${encrypt(getUser())},${encrypt(getContact())},${encrypt(content)},${encrypt(getChannel())}`;
+    const theEncryptedContent = `${encrypt(getUser())},${encrypt(getAvatar())},${encrypt(content)},${encrypt(getChannel())}`;
     if (typeof(localDb[theGunDbName]) == "undefined") {
         localDb[theGunDbName] = {};
     }

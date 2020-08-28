@@ -25,23 +25,23 @@ function loadComments(offset) {
                         var channel = comment.length > 3 ? decrypt(comment[3]) : "";
                         if (channel === getChannel()) {
                             var user = decrypt(comment[0]);
-                            if (!user) {
+                            const userRegex = /^[a-zA-Z0-9 _]*$/;
+                            if (!user || !userRegex.test(user)) {
                                 user = `<i>Anonymous</i>`
                             } else if (user.length > 35) {
                                 user = user.substring(0, 35) + `…`;
                             }
                             var epoch = key;
-                            var contact = decrypt(comment[1]);
-                            var contactImg = "";
-                            var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
-                            if (pinRegex.test(contact)) {
-                                contactImg = `/${contact}/`;
+                            var avatar = decrypt(comment[1]);
+                            const pinRegex = /^[a-zA-Z0-9-_]{46}$/;
+                            if (pinRegex.test(avatar)) {
+                                avatar = `/${avatar}/`;
                             } else {
-                                contactImg = anonymousImg
+                                avatar = anonymousImg
                             }
                             var content = new showdown.Converter().makeHtml(decrypt(comment[2]).replace("![", "! ["));
                             if (content) {
-                                commentsHTML = getComment(i, user, epoch, contactImg, content) + commentsHTML;
+                                commentsHTML = getComment(i, user, epoch, avatar, content) + commentsHTML;
                             }
                         }
                     }

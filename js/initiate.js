@@ -8,9 +8,11 @@ function initiate() {
     initiateNetworkAndComments();
     initiatePortals();
     initiateCommentArchiving();
-    setAvatar();
+    displayUser();
+    displayAvatar();
     window.scrollTo(0,document.body.scrollHeight);
-    if (getUser() === null) {
+    var theUser = getUser();
+    if (theUser === null || theUser == "") {
         clickToLogin();
     }
 }

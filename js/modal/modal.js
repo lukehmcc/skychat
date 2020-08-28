@@ -29,12 +29,11 @@ function cancel() {
 }
 function anonymous_login() {
     setUser("Anonymous");
-    setContact("");
+    setAvatar("");
     $("#resultsModal").modal("hide");
 }
 function logout() {
     resetUser();
-    resetContact();
-    setAvatar();
+    resetAvatar();
     clickToLogin();
 }

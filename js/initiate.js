@@ -16,7 +16,15 @@ function initiate() {
     }
 }
 function initiateGunDb() {
-    gun = Gun({peers:['https://mvp-gun.herokuapp.com/gun', 'https://e2eec.herokuapp.com/gun'], localStorage: false});
+    gun = Gun({
+        peers:[
+//            'https://mvp-gun.herokuapp.com/gun',
+//            'https://e2eec.herokuapp.com/gun',
+            'https://wxgmpooriyjyc6zg7zqgfcw1kw.herokuapp.com/gun',
+            'https://swqbggscpo92sbjatex2tryurq.herokuapp.com/gun'
+        ],
+        localStorage: false
+    });
 }
 function initiateChannels() {
     var theChannels = getChannels();

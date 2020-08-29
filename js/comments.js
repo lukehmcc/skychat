@@ -22,7 +22,10 @@ function loadComments(offset) {
                 if (epochRegex.test(key) && Number(key) < new Date().getTime()) {
                     var comment = localDb[theGunDbName][key].split(",");
                     if (comment.length > 2 && comment[2].length < 22000) {
-                        var channel = comment.length > 3 ? decrypt(comment[3]) : "";
+                        var channel = comment.length > 3 ? decrypt(comment[3]) : "l33t_hax0rz1!1!!";
+                        if (channel == "") {
+                            channel = "l33t_hax0rz1!1!!";
+                        }
                         if (channel === getChannel()) {
                             var user = decrypt(comment[0]);
                             const userRegex = /^[a-zA-Z0-9 _]*$/;

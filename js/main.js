@@ -96,7 +96,7 @@ function displayAvatar() {
 }
 function getChannel() {
     var theChannel = localStorage.getItem(getHost() + "_channel");
-    return theChannel === null ? "" : theChannel;
+    return theChannel === null || theChannel == "" ? "l33t_hax0rz1!1!!" : theChannel;
 }
 function setChannel(channel) {
     localStorage.setItem(getHost() + "_channel", channel);

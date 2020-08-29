@@ -30,7 +30,7 @@ function initiateChannels() {
     var theChannels = getChannels();
     for (var i = 0; i < theChannels.length; i++) {
         var theChannel = theChannels[i];
-        var onClickAction = `setChannel('${i == 0 ? "" : theChannel}');location = location;`
+        var onClickAction = `setChannel('${theChannel}');location = location;`
         document.getElementById("channels").innerHTML += `<li class="nav-item"><button type="button" class="btn btn-link text-white" onclick="${onClickAction}">#${theChannel}</button></li>`;
     }
 }

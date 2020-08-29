@@ -4,17 +4,17 @@ function newChat() {
         .then(response => response.text())
         .then(result => {
             const host = `${getRandomString(26)}`;
-            const skychatDiv = `<skychat id="skychat_host" style="display: none">`;
-            const endingIndex = result.lastIndexOf(skychatDiv);
+            const defychatDiv = `<defychat id="defychat_host" style="display: none">`;
+            const endingIndex = result.lastIndexOf(defychatDiv);
             const newPage = result.substring(0, endingIndex) 
-            + `${skychatDiv}${host}</skychat>`
-            + `<skychat id="skychat_epoch" style="display: none">${getEpochDay(1)}</skychat>`
-            + `<skychat id="skychat_channels" style="display: none">general</skychat>`
+            + `${defychatDiv}${host}</defychat>`
+            + `<defychat id="defychat_epoch" style="display: none">${getEpochDay(1)}</defychat>`
+            + `<defychat id="defychat_channels" style="display: none">general</defychat>`
             +`</body></html>`;
             const blob = new Blob([newPage],{ type: 'text/html' });
             var formData = new FormData();
             formData.append('file', blob, 'index.html');
-            fetch(`${getUploadPath(getNetwork())}${host}?filename=skychat.html&force=true`, {method: 'POST',body: formData})
+            fetch(`${getUploadPath(getNetwork())}${host}?filename=defychat.html&force=true`, {method: 'POST',body: formData})
                 .then(response => response.json())
                 .then(result => {
                     top.window.location.href = `https://${top.window.location.hostname}/${result[getUploadResponseKey(getNetwork())]}/?secret=${getRandomString(26)}`;

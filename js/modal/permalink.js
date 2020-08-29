@@ -6,12 +6,12 @@ function clickToPermalink() {
     const newPage = `<!DOCTYPE html>`
         + `<html lang="en">`
         + `<head>`
-        + `<title>Skychat</title>`
+        + `<title>Defy.chat</title>`
         + `<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">`
         + `<meta content="text/html;charset=utf-8" http-equiv="Content-Type">`
         + `<meta content="utf-8" http-equiv="encoding">`
         + `</head>`
-        + `<frameset><frame id="skychat_frame" src="/${thePin}/?secret=${theSecret}"></frame></frameset>`
+        + `<frameset><frame id="defychat_frame" src="/${thePin}/?secret=${theSecret}"></frame></frameset>`
         + `</html>`;
     const blob = new Blob([newPage],{ type: 'text/html' });
     var formData = new FormData();

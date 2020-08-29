@@ -1,8 +1,8 @@
-# Skychat
+# Defy.chat
 
 ## About
 
-Skychat is a chat application that runs on top of [Skynet](https://github.com/NebulousLabs/skynet-webportal) and [GunDB](https://gun.eco/).
+Defy.chat is a chat application that runs on top of [Skynet](https://github.com/NebulousLabs/skynet-webportal) and [GunDB](https://gun.eco/).
 
 ## Public Example
 
@@ -10,17 +10,17 @@ https://skyportal.xyz/AAAwZoUogtlPlxYHr_qOG0GowJBIlqsQwKHiHOw4mfxGvQ/
 
 ## Deployment
 
-To deploy a new Skychat instance:
+To deploy a new Defy.chat instance:
 
-  * Fork or clone the Skychat GIT repository
+  * Fork or clone the defychat GIT repository
   * Modify settings.json
-  * Upload the Skychat GIT repository as a directory to Skynet
+  * Upload the defychat GIT repository as a directory to Skynet
   * Visit the Skylink where the directory was uploaded to in a browser
 
-To update an existing Skychat instance:
+To update an existing Defy.chat instance:
 
-  * Pull the most recent version of the Skychat GIT repository
-  * Upload the Skychat GIT repository as a directory to Skynet
+  * Pull the most recent version of the defychat GIT repository
+  * Upload the defychat GIT repository as a directory to Skynet
   * Visit the Skylink where the directory was uploaded to in a browser
 
 ## Optional URL Parameters

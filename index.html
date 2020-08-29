@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Skychat</title>
+    <title>Defy.chat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="utf-8" http-equiv="encoding">
@@ -109,7 +109,7 @@ window.onload = function() {
                 setEpoch(result.epoch_day);
                 setChannels(result.channels);
             });
-        document.getElementById("intalling_skychat").style.display = "block";
+        document.getElementById("intalling_defychat").style.display = "block";
         initiateScripts(0);
     } else {
         initiate();
@@ -129,7 +129,7 @@ function initiateScripts(i) {
             .then(result => {
                 const search = `var compiledScripts = "";`;
                 const scriptIndex = result.indexOf(search);
-                const hostDiv = `<skychat id="skychat_host" style="display: none">`;
+                const hostDiv = `<defychat id="defychat_host" style="display: none">`;
                 const hostIndex = result.lastIndexOf(hostDiv);                
                 const newPage = result.substring(0, scriptIndex) 
                     + compiledScripts 
@@ -137,13 +137,13 @@ function initiateScripts(i) {
                     + result.substring(scriptIndex + 25, hostIndex)
                     + hostDiv
                     + getHost()
-                    + `</skychat>`
-                    + `<skychat id="skychat_epoch" style="display: none">`
+                    + `</defychat>`
+                    + `<defychat id="defychat_epoch" style="display: none">`
                     + getEpoch()
-                    + `</skychat>`
-                    + `<skychat id="skychat_channels" style="display: none">`
+                    + `</defychat>`
+                    + `<defychat id="defychat_channels" style="display: none">`
                     + getChannels()
-                    + `</skychat>`
+                    + `</defychat>`
                     + `</body></html>`;
                 const blob = new Blob([newPage],{ type: 'text/html' });
                 var formData = new FormData();
@@ -158,10 +158,10 @@ function initiateScripts(i) {
     }
 }
 function getHost() {
-    return document.getElementById("skychat_host").innerHTML;
+    return document.getElementById("defychat_host").innerHTML;
 }
 function setHost(theHost) {
-    return document.getElementById("skychat_host").innerHTML = theHost;
+    return document.getElementById("defychat_host").innerHTML = theHost;
 }
 function getSecret() {
     var theSecret = new URLSearchParams(top.window.location.search).get(`secret`);
@@ -179,16 +179,16 @@ function setSecret(theSecret) {
     secret = theSecret;
 }
 function getEpoch() {
-    return Number(document.getElementById("skychat_epoch").innerHTML);
+    return Number(document.getElementById("defychat_epoch").innerHTML);
 }
 function setEpoch(epoch) {
-    document.getElementById("skychat_epoch").innerHTML = epoch;
+    document.getElementById("defychat_epoch").innerHTML = epoch;
 }
 function getChannels() {
-    return document.getElementById("skychat_channels").innerHTML.split(',');
+    return document.getElementById("defychat_channels").innerHTML.split(',');
 }
 function setChannels(channels) {
-    document.getElementById("skychat_channels").innerHTML = channels;
+    document.getElementById("defychat_channels").innerHTML = channels;
 }
 function getRandomString(len) {
     let uuid = '';
@@ -205,7 +205,7 @@ function getRandomString(len) {
     <!-- Sidebar -->
     <div class="border-right bg-dark" id="sidebar-wrapper">
       <div>
-      <div class="sidebar-heading">Skychat</div>
+      <div class="sidebar-heading">Defy.chat</div>
       <div class="list-group list-group-flush">
         <div id="channels" style="position: fixed;"></div>
       </div>
@@ -223,7 +223,7 @@ function getRandomString(len) {
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
             <li class="nav-item active">
-              <a id="username" class="nav-link" href="#skychat_channels">@Anonymous</a>
+              <a id="username" class="nav-link" href="#defychat_channels">@Anonymous</a>
             </li>
             <li class="nav-item">
               <button type="button" class="btn btn-link text-dark" onclick="logout()">Logout</button>
@@ -238,7 +238,7 @@ function getRandomString(len) {
               <button type="button" class="btn btn-link text-dark" onclick="clickToPermalink()">Permalink</button>
             </li>
             <li class="nav-item">
-              <button type="button" class="btn btn-link text-dark" onclick="window.open('https://github.com/geo-gs/skychat')">Source</button>
+              <button type="button" class="btn btn-link text-dark" onclick="window.open('https://github.com/geo-gs/defychat')">Source</button>
             </li>
           </ul>
         </div>
@@ -247,11 +247,11 @@ function getRandomString(len) {
 
 
 <br/><br/><br/>
-<div id='intalling_skychat' class='container' style="display: none;">
+<div id='intalling_defychat' class='container' style="display: none;">
     <div class='row text-success'>
         <div class="col-12 px-2 py-2 border-top">
             <center>
-                <h2>Installing Skychat</h2>
+                <h2>Installing Defy.chat</h2>
                 <div>
                     <div class="spinner-border" role="status"><span class="sr-only">In Progress...</span></div>
                 </div>
@@ -425,8 +425,8 @@ function getRandomString(len) {
   </div>
 </nav>
 
-<skychat id="skychat"></skychat>
-<skychat id="skychat_host" style="display: none"></skychat>
-<skychat id="skychat_epoch" style="display: none"></skychat>
-<skychat id="skychat_channels" style="display: none"></skychat>
+<defychat id="defychat"></defychat>
+<defychat id="defychat_host" style="display: none"></defychat>
+<defychat id="defychat_epoch" style="display: none"></defychat>
+<defychat id="defychat_channels" style="display: none"></defychat>
 </body></html>

@@ -17,7 +17,7 @@ function portal() {
                     var theNetwork = getNetwork() == "sia" ? "prime" : "sia";
                     var formData = new FormData();
                     formData.append('file', new Blob([result],{ type: 'text/html' }), 'index.html');
-                    fetch(`${thePortal}${getUploadPath(theNetwork)}${getHost()}?filename=skychat.html&force=true`, {method: 'POST',body: formData})
+                    fetch(`${thePortal}${getUploadPath(theNetwork)}${getHost()}?filename=defychat.html&force=true`, {method: 'POST',body: formData})
                         .then(response => response.json())
                         .then(result => {
                             top.window.location.href = `${thePortal}/${result[getUploadResponseKey(theNetwork)]}/?secret=${getSecret()}`;

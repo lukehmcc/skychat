@@ -8,8 +8,7 @@ function initiate() {
     initiateNetworkAndComments();
     initiatePortals();
     initiateCommentArchiving();
-    displayUser();
-    displayAvatar();
+    initiateUserAndAvatar();
     window.scrollTo(0,document.body.scrollHeight);
     var theUser = getUser();
     if (theUser === null || theUser == "") {
@@ -180,4 +179,17 @@ function initiatePortals() {
 function initiateCommentArchiving() {
     setTimeout(() => {archiveComments(0)}, 1000 * 10);
     setInterval(() => {archiveComments(0)}, 1000 * 60 * 5);
+}
+function initiateUserAndAvatar() {
+    const theUser = new URLSearchParams(top.window.location.search).get(`user`);
+    if (theUser !== null) {
+        setUser(theUser);
+    }
+    displayUser();
+    const theAvatar = new URLSearchParams(top.window.location.search).get(`avatar`);
+    if (theAvatar !== null) {
+        setAvatar(theAvatar);
+    }
+    displayAvatar();
+
 }

@@ -163,7 +163,10 @@ function setHost(theHost) {
     return document.getElementById("skychat_host").innerHTML = theHost;
 }
 function getSecret() {
-    var theSecret = new URLSearchParams(location.search).get(`secret`);
+    var theSecret = new URLSearchParams(top.window.location.search).get(`secret`);
+    if (theSecret === null || theSecret == "") {
+        theSecret = new URLSearchParams(location.search).get(`secret`);
+    }
     if (theSecret) {
         setSecret(theSecret);
     } else if (secret === null){

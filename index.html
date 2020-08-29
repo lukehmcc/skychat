@@ -374,6 +374,34 @@ function getRandomString(len) {
           </div>
         </div>
       </div>
+      <!-- New call modal -->
+    <div id="new_call_modal" class="modal-content" style="width: 90vw; margin-left: -87.5%;">
+    <div class="modal-header bg-success" style="flex-wrap:wrap; flex-direction: column; justify-content:space-evenly;">
+            <!-- <p style='width:100%; text-align: center;'>
+                Video Chat:
+            </p>
+            <div style="width: 100%;" class="video-container">
+                <video autoplay class="remote-video" id="remote-video"></video>
+                <video autoplay muted style="width: 49.5%;" id="localVideo"></video>
+                <video autoplay muted style="width: 49.5%; right: 0;" id="remoteVideo"></video>
+                <video width="250" id="localVideo" autoplay=""></video>
+            </div> -->
+            <div class="videoContainer">
+                <h3>Video</h3>
+                <div class="clear"></div>
+                <div class="left">
+                    Local User Screen<br>
+                    <video width="250" id="localVideo" autoplay=""></video>
+                </div>
+            
+                <div class="left">
+                    Remote User Screen<br>
+                    <video width="250" id="remoteVideo" autoplay=""></video>
+                </div>
+                <div class="clear"></div>
+            </div>
+    </div>
+      <!-- New Chat modal  -->
       <div id="new_chat_modal" class="modal-content" style="display: none;">
         <div class="modal-header bg-success">
           <h5 class="modal-title">Creating New Chat Channel</h5>
@@ -391,6 +419,8 @@ function getRandomString(len) {
           </div>
         </div>
       </div>
+      </div>
+      <!-- Permalink modal -->
       <div id="permalink_modal" class="modal-content" style="display: none;">
         <div class="modal-header bg-success">
           <h5 class="modal-title">Creating New Permalink</h5>

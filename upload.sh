@@ -1,2 +1,2 @@
-skyfile=$( curl -X POST "https://siasky.net/skynet/skyfile" -F file=@skychat.html -F file=js/videoChat.js | awk 'BEGIN { FS="\""; RS="," }; { if ($2 == "skylink") {print $4} }')
-'/mnt/c/Program Files (x86)/BraveSoftware/Brave-Browser/Application/brave.exe' skyportal.xyz/$skyfile/skychat.html
+skyfile=$(find . -type f | awk -v prefix="-F files[]=@" -v suffix=";filename=" '{print prefix $0 suffix substr($0, 3)}' | xargs curl "https://siasky.net/skynet/skyfile?filename=skychat" | awk 'BEGIN { FS="\""; RS="," }; { if ($2 == "skylink") {print $4} }')
+'/mnt/c/Program Files (x86)/BraveSoftware/Brave-Browser/Application/brave.exe' skyportal.xyz/$skyfile/

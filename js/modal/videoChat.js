@@ -47,29 +47,16 @@ let peerConnection = new RTCPeerConnection(peerConnectionConfig);
 
 // Set things up, connect event listeners, etc.
 function startup() {
-	disconnectButton = document.getElementById('disconnectButton');
-	sendButton = document.getElementById('sendButton');
-	answerButton = document.getElementById('answerButton');
-	createOfferButton = document.getElementById('createOfferButton');
-	copyOfferButton = document.getElementById('copyOfferButton');
-	copyAnswerOfferButton = document.getElementById('copyAnswerOfferButton');
-	sendFileButton = document.getElementById('sendFileButton');
-
-	messageInputBox = document.getElementById('message');
-	receiveBox = document.getElementById('receivebox');
-	answerOfferInput = document.getElementById('answerOfferInput');
-	offerInput = document.getElementById('offerInput');
-	fileDownload = document.getElementById('fileDownload');
 
 	// Set event listeners for user interface widgets
-	disconnectButton.addEventListener('click', disconnectPeers, false);
-	sendButton.addEventListener('click', sendMessage, false);
-	createOfferButton.addEventListener('click', createOffer, false);
-	answerButton.addEventListener('click', createAnswer, false);
-	copyOfferButton.addEventListener('click', copyOffer, false);
-	copyAnswerOfferButton.addEventListener('click', copyAnswerOffer, false);
-	sendFileButton.addEventListener('click', sendFile, false);
-	fileTransfer.addEventListener('change', uploadFile, false);
+// 	disconnectButton.addEventListener('click', disconnectPeers, false);
+// 	sendButton.addEventListener('click', sendMessage, false);
+// 	createOfferButton.addEventListener('click', createOffer, false);
+// 	answerButton.addEventListener('click', createAnswer, false);
+// 	copyOfferButton.addEventListener('click', copyOffer, false);
+// 	copyAnswerOfferButton.addEventListener('click', copyAnswerOffer, false);
+// 	sendFileButton.addEventListener('click', sendFile, false);
+// 	fileTransfer.addEventListener('change', uploadFile, false);
 }
 
 function copy(id){

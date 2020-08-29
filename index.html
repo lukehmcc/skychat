@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Skychat</title>
+    <title>Defy.chat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="utf-8" http-equiv="encoding">
@@ -57,6 +57,7 @@
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.0.0/crypto-js.min.js" integrity="sha384-0GjPiy2OWGZr3mGFrBPHGVu/8A+YHOeDXUFWv6NDA2nO6eVq9UoFnzUSy1bVv8FE" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/gun.js" integrity="sha384-0kBpxICYZoT8h+AK/aFHPTnvg3pFQle+S3pwvmMoUPIGBuXaHTiqNUPGRvpOU1ea" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/not.js" integrity="sha384-1tPi3AL7O+RyZptCFmnrEiZ41GSY27D0p38b9R31mJ8fjOAYCjvcrrciqFgIcnNC" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/webrtc.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/radix.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/radisk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/store.js"></script>
@@ -77,12 +78,10 @@ const scripts = [
     "js/modal/upload.js",
     "js/initiate.js"
 ];
+var secret = null;
 var compiledScripts = "";
 window.onload = function() {
-    if (new URLSearchParams(window.location.search).get(`secret`) !== null) {
-        getSecret(); //sets the secret into localStorage
-        window.location.href = [window.location.protocol, '//', window.location.hostname, window.location.pathname].join('');
-    } else if (new URLSearchParams(window.location.search).get(`compile`) === `false`) {
+    if (new URLSearchParams(location.search).get(`compile`) === `false`) {
         $.ajaxSetup({
             cache: true
         });
@@ -110,7 +109,7 @@ window.onload = function() {
                 setEpoch(result.epoch_day);
                 setChannels(result.channels);
             });
-        document.getElementById("intalling_skychat").style.display = "block";
+        document.getElementById("intalling_defychat").style.display = "block";
         initiateScripts(0);
     } else {
         initiate();
@@ -130,7 +129,7 @@ function initiateScripts(i) {
             .then(result => {
                 const search = `var compiledScripts = "";`;
                 const scriptIndex = result.indexOf(search);
-                const hostDiv = `<skychat id="skychat_host" style="display: none">`;
+                const hostDiv = `<defychat id="defychat_host" style="display: none">`;
                 const hostIndex = result.lastIndexOf(hostDiv);                
                 const newPage = result.substring(0, scriptIndex) 
                     + compiledScripts 
@@ -138,13 +137,13 @@ function initiateScripts(i) {
                     + result.substring(scriptIndex + 25, hostIndex)
                     + hostDiv
                     + getHost()
-                    + `</skychat>`
-                    + `<skychat id="skychat_epoch" style="display: none">`
+                    + `</defychat>`
+                    + `<defychat id="defychat_epoch" style="display: none">`
                     + getEpoch()
-                    + `</skychat>`
-                    + `<skychat id="skychat_channels" style="display: none">`
+                    + `</defychat>`
+                    + `<defychat id="defychat_channels" style="display: none">`
                     + getChannels()
-                    + `</skychat>`
+                    + `</defychat>`
                     + `</body></html>`;
                 const blob = new Blob([newPage],{ type: 'text/html' });
                 var formData = new FormData();
@@ -152,41 +151,44 @@ function initiateScripts(i) {
                 fetch(`${getUploadPath(getNetwork())}${getHost()}?filename=index.html&force=true`, {method: 'POST',body: formData})
                     .then(response => response.json())
                     .then(result => {
-                        window.location.pathname = `/${result[getUploadResponseKey(getNetwork())]}/`;
+                        location.href = `${location.protocol}//${location.hostname}/${result[getUploadResponseKey(getNetwork())]}/?secret=${getSecret()}`;
                     })
                     .catch(error => {console.error('Error:', error)});
             })
     }
 }
 function getHost() {
-    return document.getElementById("skychat_host").innerHTML;
+    return document.getElementById("defychat_host").innerHTML;
 }
 function setHost(theHost) {
-    return document.getElementById("skychat_host").innerHTML = theHost;
+    return document.getElementById("defychat_host").innerHTML = theHost;
 }
 function getSecret() {
-    var theSecret = new URLSearchParams(window.location.search).get(`secret`);
-    if (theSecret) {
-        localStorage.setItem(getHost() + "_secret", theSecret);
-    } else if (localStorage.getItem(getHost() + "_secret") === null){
-        localStorage.setItem(getHost() + "_secret", getRandomString(26));
+    var theSecret = new URLSearchParams(top.window.location.search).get(`secret`);
+    if (theSecret === null || theSecret == "") {
+        theSecret = new URLSearchParams(location.search).get(`secret`);
     }
-    return localStorage.getItem(getHost() + "_secret");
+    if (theSecret) {
+        setSecret(theSecret);
+    } else if (secret === null){
+        setSecret(getRandomString(26));
+    }
+    return secret;
 }
-function setSecret(secret) {
-    localStorage.setItem(getHost() + "_secret", secret);
+function setSecret(theSecret) {
+    secret = theSecret;
 }
 function getEpoch() {
-    return Number(document.getElementById("skychat_epoch").innerHTML);
+    return Number(document.getElementById("defychat_epoch").innerHTML);
 }
 function setEpoch(epoch) {
-    document.getElementById("skychat_epoch").innerHTML = epoch;
+    document.getElementById("defychat_epoch").innerHTML = epoch;
 }
 function getChannels() {
-    return document.getElementById("skychat_channels").innerHTML.split(',');
+    return document.getElementById("defychat_channels").innerHTML.split(',');
 }
 function setChannels(channels) {
-    document.getElementById("skychat_channels").innerHTML = channels;
+    document.getElementById("defychat_channels").innerHTML = channels;
 }
 function getRandomString(len) {
     let uuid = '';
@@ -203,7 +205,7 @@ function getRandomString(len) {
     <!-- Sidebar -->
     <div class="border-right bg-dark" id="sidebar-wrapper">
       <div>
-      <div class="sidebar-heading">Skychat</div>
+      <div class="sidebar-heading">Defy.chat</div>
       <div class="list-group list-group-flush">
         <div id="channels" style="position: fixed;"></div>
       </div>
@@ -221,7 +223,7 @@ function getRandomString(len) {
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
             <li class="nav-item active">
-              <a id="username" class="nav-link" href="#skychat_channels">@Anonymous</a>
+              <a id="username" class="nav-link" href="#defychat_channels">@Anonymous</a>
             </li>
             <li class="nav-item">
               <button type="button" class="btn btn-link text-dark" onclick="logout()">Logout</button>
@@ -236,7 +238,7 @@ function getRandomString(len) {
               <button type="button" class="btn btn-link text-dark" onclick="clickToPermalink()">Permalink</button>
             </li>
             <li class="nav-item">
-              <button type="button" class="btn btn-link text-dark" onclick="window.open('https://github.com/geo-gs/skychat')">Source</button>
+              <button type="button" class="btn btn-link text-dark" onclick="window.open('https://github.com/geo-gs/defychat')">Source</button>
             </li>
           </ul>
         </div>
@@ -245,11 +247,11 @@ function getRandomString(len) {
 
 
 <br/><br/><br/>
-<div id='intalling_skychat' class='container' style="display: none;">
+<div id='intalling_defychat' class='container' style="display: none;">
     <div class='row text-success'>
         <div class="col-12 px-2 py-2 border-top">
             <center>
-                <h2>Installing Skychat</h2>
+                <h2>Installing Defy.chat</h2>
                 <div>
                     <div class="spinner-border" role="status"><span class="sr-only">In Progress...</span></div>
                 </div>
@@ -342,27 +344,6 @@ function getRandomString(len) {
           </div>
         </div>
       </div>
-      <div id="secret_modal" class="modal-content" style="display: none;">
-        <div class="modal-header bg-success">
-          <h5 class="modal-title">Chat Channel Secret</h5>
-        </div>
-        <div class="modal-body">
-          <div class="md-form">
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text">Secret</span>
-              </div>
-              <input id="secret" type="text" class="form-control">
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer bg-success">
-          <div>
-            <button type='button' class="btn btn-secondary" onclick='secret()'>Set</button>
-            <button type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
-          </div>
-        </div>
-      </div>
       <div id="portal_modal" class="modal-content" style="display: none;">
         <div class="modal-header bg-success">
           <h5 class="modal-title">Portal</h5>
@@ -444,8 +425,8 @@ function getRandomString(len) {
   </div>
 </nav>
 
-<skychat id="skychat"></skychat>
-<skychat id="skychat_host" style="display: none"></skychat>
-<skychat id="skychat_epoch" style="display: none"></skychat>
-<skychat id="skychat_channels" style="display: none"></skychat>
+<defychat id="defychat"></defychat>
+<defychat id="defychat_host" style="display: none"></defychat>
+<defychat id="defychat_epoch" style="display: none"></defychat>
+<defychat id="defychat_channels" style="display: none"></defychat>
 </body></html>

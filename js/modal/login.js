@@ -2,7 +2,7 @@ function login() {
     document.getElementById('login-trigger-container').style.display = `none`;
     document.getElementById('login-loading-container').style.display = `block`;
     setUser(document.getElementById("user").value);
-    setContact("");
+    setAvatar("");
     var file = document.getElementById('contact').files[0];
     if (file != null) {
         $.ajax({
@@ -15,17 +15,14 @@ function login() {
             processData: false,
             dataType: 'json',
             success: function (data, textStatus, jqXHR) {
-                setContact(data[getUploadResponseKey(getNetwork())]);
-                setAvatar();
+                setAvatar(data[getUploadResponseKey(getNetwork())]);
                 $("#resultsModal").modal("hide");
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                setAvatar();
                 $("#resultsModal").modal("hide");
             }
         });
     } else {
-        setAvatar();
         $("#resultsModal").modal("hide");
     }
 }

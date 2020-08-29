@@ -51,27 +51,52 @@ function getPortal() {
     return window.location.hostname;
 }
 function getUser() {
-    return localStorage.getItem(getHost() + "_user");
+    try {
+        const encryptedUser = localStorage.getItem(getHost() + "_user");
+        return encryptedUser === null ? null : decrypt(encryptedUser);
+    } catch(err) {
+        return null;
+    }
 }
 function setUser(user) {
-    localStorage.setItem(getHost() + "_user", user);
-    document.getElementById("username").innerHTML = `@${user}`;
+    localStorage.setItem(getHost() + "_user", encrypt(user));
+    displayUser();
 }
 function resetUser() {
     localStorage.removeItem(getHost() + "_user");
+    displayUser();
 }
-function getContact() {
-    return localStorage.getItem(getHost() + "_contact");
+function displayUser() {
+    const theUser = getUser();
+    const userRegex = /^[a-zA-Z0-9 _]*$/;
+    const displayUser = theUser !== null && theUser != "" && userRegex.test(theUser) ? theUser : "Anonymous";
+    document.getElementById("username").innerHTML = `@${displayUser}`;
 }
-function setContact(contact) {
-    localStorage.setItem(getHost() + "_contact", contact);
+function getAvatar() {
+    try {
+        const encryptedAvatar = localStorage.getItem(getHost() + "_avatar");
+        return encryptedAvatar === null ? null : decrypt(encryptedAvatar);
+    } catch(err) {
+        return null;
+    }
 }
-function resetContact() {
-    localStorage.removeItem(getHost() + "_contact");
+function setAvatar(avatar) {
+    localStorage.setItem(getHost() + "_avatar", encrypt(avatar));
+    displayAvatar();
+}
+function resetAvatar() {
+    localStorage.removeItem(getHost() + "_avatar");
+    displayAvatar();
+}
+function displayAvatar() {
+    const avatar = getAvatar();
+    const pinRegex = /^[a-zA-Z0-9-_]{46}$/;
+    const avatarSrc = avatar !== null && pinRegex.test(avatar) ? `/${avatar}/` : anonymousImg;
+    document.getElementById("avatar").src = avatarSrc;
 }
 function getChannel() {
     var theChannel = localStorage.getItem(getHost() + "_channel");
-    return theChannel === null ? "" : theChannel;
+    return theChannel === null || theChannel == "" ? "l33t_hax0rz1!1!!" : theChannel;
 }
 function setChannel(channel) {
     localStorage.setItem(getHost() + "_channel", channel);
@@ -92,12 +117,6 @@ function getGunDb(gunDbName) {
 }
 function getEpochDay(offset) {
     return Math.round(new Date().getTime()/86400000) - offset;
-}
-function setAvatar() {
-    var contact = getContact();
-    var pinRegex = /^[a-zA-Z0-9-_]{46}$/;
-    var contactImg = contact !== null && pinRegex.test(contact) ? `/${contact}/` : anonymousImg;
-    document.getElementById("avatar").src = contactImg;
 }
 function isWindowAtBottom() {
     return (window.innerHeight + window.pageYOffset) > document.body.offsetHeight - 5;

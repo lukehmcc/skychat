@@ -8,20 +8,29 @@ function initiate() {
     initiateNetworkAndComments();
     initiatePortals();
     initiateCommentArchiving();
-    setAvatar();
+    initiateUserAndAvatar();
     window.scrollTo(0,document.body.scrollHeight);
-    if (getUser() === null) {
+    var theUser = getUser();
+    if (theUser === null || theUser == "") {
         clickToLogin();
     }
 }
 function initiateGunDb() {
-    gun = Gun({peers:['https://mvp-gun.herokuapp.com/gun', 'https://e2eec.herokuapp.com/gun'], localStorage: false});
+    gun = Gun({
+        peers:[
+            'https://mvp-gun.herokuapp.com/gun',
+            'https://e2eec.herokuapp.com/gun',
+            'https://wxgmpooriyjyc6zg7zqgfcw1kw.herokuapp.com/gun',
+            'https://swqbggscpo92sbjatex2tryurq.herokuapp.com/gun'
+        ],
+        localStorage: false
+    });
 }
 function initiateChannels() {
     var theChannels = getChannels();
     for (var i = 0; i < theChannels.length; i++) {
         var theChannel = theChannels[i];
-        var onClickAction = `setChannel('${i == 0 ? "" : theChannel}');window.location = window.location;`
+        var onClickAction = `setChannel('${theChannel}');location = location;`
         document.getElementById("channels").innerHTML += `<li class="nav-item"><button type="button" class="btn btn-link text-white" onclick="${onClickAction}">#${theChannel}</button></li>`;
     }
 }
@@ -178,4 +187,17 @@ function initiatePortals() {
 function initiateCommentArchiving() {
     setTimeout(() => {archiveComments(0)}, 1000 * 10);
     setInterval(() => {archiveComments(0)}, 1000 * 60 * 5);
+}
+function initiateUserAndAvatar() {
+    const theUser = new URLSearchParams(top.window.location.search).get(`user`);
+    if (theUser !== null) {
+        setUser(theUser);
+    }
+    displayUser();
+    const theAvatar = new URLSearchParams(top.window.location.search).get(`avatar`);
+    if (theAvatar !== null) {
+        setAvatar(theAvatar);
+    }
+    displayAvatar();
+
 }

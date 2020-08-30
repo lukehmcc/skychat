@@ -17,6 +17,8 @@ function clickToUpload() {
 function clickToLogin() {
     document.getElementById('login-trigger-container').style.display = `block`;
     document.getElementById('login-loading-container').style.display = `none`;
+    document.getElementById("user").value = getUser();
+    document.getElementById("identity").value = getIdentity();
     showModal("login_modal");
 }
 function clickToChangePortal() {
@@ -28,12 +30,13 @@ function cancel() {
     $("#resultsModal").modal("hide");
 }
 function anonymous_login() {
-    setUser("Anonymous");
+    setUser("Anonymous", getRandomString(26));
     setAvatar("");
     $("#resultsModal").modal("hide");
 }
 function logout() {
     resetUser();
+    resetIdentity();
     resetAvatar();
     clickToLogin();
 }

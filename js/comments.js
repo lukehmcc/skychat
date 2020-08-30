@@ -98,7 +98,12 @@ function parseCrypticoCipherText(epoch, cipherText) {
                     user = user.substring(0, 35) + `…`;
                 }
                 if (package.verified && package.pubKeyId.length > 3) {
-                    user += ` <a id='identity_${epoch}_${package.pubKeyId}' href = '${getIdentity()}'>#${package.pubKeyId.substring(0, 4)}</a>`;
+                    const theIdentity = stripXSS(package.identity);
+                    if (theIdentity !== null && typeof(theIdentity) != "undefined" && theIdentity != "") {
+                        user += ` <a id='identity_${epoch}_${package.pubKeyId}' href = '${theIdentity}'>#${package.pubKeyId.substring(0, 4)}</a>`;
+                    } else {
+                        user +=  ` <font id='identity_${epoch}_${package.pubKeyId}' class="text-muted">#${package.pubKeyId.substring(0, 4)}</font>`
+                    }
                 }
                 var avatar = stripXSS(package.avatar);
                 const pinRegex = /^[a-zA-Z0-9-_]{46}$/;
@@ -146,5 +151,9 @@ function loadAnonymousAvatar(element) {
     element.src = anonymousImg;
 }
 function stripXSS(data) {
-    return data.replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    return data
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#39;");
 }

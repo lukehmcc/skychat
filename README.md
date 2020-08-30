@@ -6,7 +6,7 @@ Defy.chat is a chat application that runs on top of [Skynet](https://github.com/
 
 ## Public Example
 
-https://skyportal.xyz/AADvyQlTirhy9oRjsmph1OQe7K7liGxGDvLW4SJHK9gwWA/
+https://skyportal.xyz/AAA9fYl2pQ58zTYpHeAlqQgVIkJY7_rLObGpfT88sKNt0g/
 
 ## Deployment
 

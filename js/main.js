@@ -119,6 +119,9 @@ function getChannel() {
 }
 function setChannel(channel) {
     localStorage.setItem(getHost() + "_channel", channel);
+    initiateChannels();
+    initiateCommentContainers();
+    loadComments(0);
 }
 function getGunDbName(offset) {
     var epochDay = getEpochDay(offset);

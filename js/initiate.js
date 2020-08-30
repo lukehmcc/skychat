@@ -35,16 +35,18 @@ function initializeCrypto() {
     chatPubKey = cryptico.publicKeyString(chatRsaKey);
 }
 function initiateChannels() {
+    document.getElementById("channels").innerHTML = "";
     var currentChannel = getChannel();
     var theChannels = getChannels();
     for (var i = 0; i < theChannels.length; i++) {
         var theChannel = theChannels[i];
         var textClass = theChannel === currentChannel ? "text-white" : "text-muted";
-        var onClick = `onclick="setChannel('${theChannel}');location = location;"`
+        var onClick = `onclick="setChannel('${theChannel}')"`
         document.getElementById("channels").innerHTML += `<li class="nav-item"><button type="button" class="btn btn-link ${textClass}" ${onClick}>#${theChannel}</button></li>`;
     }
 }
 function initiateCommentContainers() {
+    document.getElementById("comments").innerHTML = "";
     var epochDifference = getEpochDay(0) - getEpoch() + 1;
     for (var i = 0; i < epochDifference && i < 100; i++) {
         initiateCommentContainer(i);

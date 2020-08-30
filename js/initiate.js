@@ -35,11 +35,13 @@ function initializeCrypto() {
     chatPubKey = cryptico.publicKeyString(chatRsaKey);
 }
 function initiateChannels() {
+    var currentChannel = getChannel();
     var theChannels = getChannels();
     for (var i = 0; i < theChannels.length; i++) {
         var theChannel = theChannels[i];
-        var onClickAction = `setChannel('${theChannel}');location = location;`
-        document.getElementById("channels").innerHTML += `<li class="nav-item"><button type="button" class="btn btn-link text-white" onclick="${onClickAction}">#${theChannel}</button></li>`;
+        var textClass = theChannel === currentChannel ? "text-white" : "text-muted";
+        var onClick = `onclick="setChannel('${theChannel}');location = location;"`
+        document.getElementById("channels").innerHTML += `<li class="nav-item"><button type="button" class="btn btn-link ${textClass}" ${onClick}>#${theChannel}</button></li>`;
     }
 }
 function initiateCommentContainers() {

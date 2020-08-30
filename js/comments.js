@@ -35,7 +35,7 @@ function loadComments(offset) {
                 console.log(err);
             }
         }
-        if (commentsHTML !== "") {
+//        if (commentsHTML !== "") {
             document.getElementById("welcome").innerHTML = "";
             var gunDbComments = document.getElementById(theGunDbName);
             if (gunDbComments == null) {
@@ -54,7 +54,7 @@ function loadComments(offset) {
             } else if (atTop && offset != 0) {
                 document.getElementById(getGunDbName(offset-1)).scrollIntoView();
             }
-        }
+//        }
     }
 }
 function parseAesCipherText(epoch, cipherText) {
@@ -91,26 +91,28 @@ function parseCrypticoCipherText(epoch, cipherText) {
     if (cipherText.length < 5000000) {
         const package = decryptMessage(cipherText.substring(8));
         if (package.message.length < 20000) {
-            user = stripXSS(package.user);
-            const userRegex = /^[a-zA-Z0-9 _]*$/;
-            if (!user || !userRegex.test(user)) {
-                user = `<i>Anonymous</i>`
-            } else if (user.length > 35) {
-                user = user.substring(0, 35) + `…`;
-            }
-            if (package.verified && package.pubKeyId.length > 3) {
-                user += ` <a href = '${getIdentity()}'>#${package.pubKeyId.substring(0, 4)}</a>`;
-            }
-            var avatar = stripXSS(package.avatar);
-            const pinRegex = /^[a-zA-Z0-9-_]{46}$/;
-            if (pinRegex.test(avatar)) {
-                avatar = `/${avatar}/`;
-            } else {
-                avatar = anonymousImg
-            }
-            var content = new showdown.Converter().makeHtml(stripXSS(package.message).replace("![", "! ["));
-            if (content) {
-                return getComment(user, epoch, avatar, content, package.verified, package.pubKeyId);
+            if (package.channel === getChannel()) {
+                user = stripXSS(package.user);
+                const userRegex = /^[a-zA-Z0-9 _]*$/;
+                if (!user || !userRegex.test(user)) {
+                    user = `<i>Anonymous</i>`
+                } else if (user.length > 35) {
+                    user = user.substring(0, 35) + `…`;
+                }
+                if (package.verified && package.pubKeyId.length > 3) {
+                    user += ` <a href = '${getIdentity()}'>#${package.pubKeyId.substring(0, 4)}</a>`;
+                }
+                var avatar = stripXSS(package.avatar);
+                const pinRegex = /^[a-zA-Z0-9-_]{46}$/;
+                if (pinRegex.test(avatar)) {
+                    avatar = `/${avatar}/`;
+                } else {
+                    avatar = anonymousImg
+                }
+                var content = new showdown.Converter().makeHtml(stripXSS(package.message).replace("![", "! ["));
+                if (content) {
+                    return getComment(user, epoch, avatar, content, package.verified, package.pubKeyId);
+                }
             }
         }
     }

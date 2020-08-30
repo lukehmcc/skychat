@@ -35,26 +35,24 @@ function loadComments(offset) {
                 console.log(err);
             }
         }
-//        if (commentsHTML !== "") {
-            document.getElementById("welcome").innerHTML = "";
-            var gunDbComments = document.getElementById(theGunDbName);
-            if (gunDbComments == null) {
-                if (offset == 0) {
-                    document.getElementById("comments").innerHTML += `<div id="${theGunDbName}"></div>`;
-                } else {
-                    document.getElementById("comments").innerHTML = `<div id="${theGunDbName}"></div>${document.getElementById("comments").innerHTML}`;
-                }
-                gunDbComments = document.getElementById(theGunDbName);
+        document.getElementById("welcome").innerHTML = "";
+        var gunDbComments = document.getElementById(theGunDbName);
+        if (gunDbComments == null) {
+            if (offset == 0) {
+                document.getElementById("comments").innerHTML += `<div id="${theGunDbName}"></div>`;
+            } else {
+                document.getElementById("comments").innerHTML = `<div id="${theGunDbName}"></div>${document.getElementById("comments").innerHTML}`;
             }
-            var atTop = isWindowAtTop();
-            var atBottom = isWindowAtBottom();
-            gunDbComments.innerHTML = commentsHTML;
-            if (atBottom) {
-                window.scrollTo(0, document.body.scrollHeight);
-            } else if (atTop && offset != 0) {
-                document.getElementById(getGunDbName(offset-1)).scrollIntoView();
-            }
-//        }
+            gunDbComments = document.getElementById(theGunDbName);
+        }
+        var atTop = isWindowAtTop();
+        var atBottom = isWindowAtBottom();
+        gunDbComments.innerHTML = commentsHTML;
+        if (atBottom) {
+            window.scrollTo(0, document.body.scrollHeight);
+        } else if (atTop && offset != 0) {
+            document.getElementById(getGunDbName(offset-1)).scrollIntoView();
+        }
     }
 }
 function parseAesCipherText(epoch, cipherText) {

@@ -98,7 +98,7 @@ function parseCrypticoCipherText(epoch, cipherText) {
                     user = user.substring(0, 35) + `…`;
                 }
                 if (package.verified && package.pubKeyId.length > 3) {
-                    user += ` <a href = '${getIdentity()}'>#${package.pubKeyId.substring(0, 4)}</a>`;
+                    user += ` <a id='identity_${epoch}_${package.pubKeyId}' href = '${getIdentity()}'>#${package.pubKeyId.substring(0, 4)}</a>`;
                 }
                 var avatar = stripXSS(package.avatar);
                 const pinRegex = /^[a-zA-Z0-9-_]{46}$/;
@@ -132,7 +132,7 @@ function getComment(user, epoch, image, message, verified, pubKeyId) {
     var onclick = "";
     if (verified) {
         classes += " border border-success";
-        onclick = `onclick='alert("${pubKeyId}");'`;
+        onclick = `onclick='document.getElementById("identity_${epoch}_${pubKeyId}").innerHTML = "#${pubKeyId}";'`;
     }
     return `<div class='row'><div class='col-2 px-2 py-2 text-right'><img class='${classes}' width='50px' height='50px' src='${transparentImg}' ${onclick} onload='loadAvatar(this, "${image}")' onerror='loadAnonymousAvatar(this)'/></div><div class='col-10 px-2 py-2 border-top overflow-auto'><b>${user}</b> <i class="text-muted">${postedAt}</i><br/>${message}</div></div>`;
 }

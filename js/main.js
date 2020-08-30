@@ -70,7 +70,12 @@ function displayUser() {
     const theUser = getUser();
     const userRegex = /^[a-zA-Z0-9 _]*$/;
     const displayUser = theUser !== null && theUser != "" && userRegex.test(theUser) ? theUser : "Anonymous";
-    document.getElementById("username").innerHTML = `@${displayUser}`;
+    const theUserPubKeyId = getUserPubKeyId();
+    const displayPubKeyId = theUserPubKeyId !== null && typeof(theUserPubKeyId) != "undefined" && theUserPubKeyId.length > 3 ? `#${theUserPubKeyId.substring(0, 4)}` : "";
+    document.getElementById("username").innerHTML = `<font class="text-dark" style="font-weight: bold;">@${displayUser}</font><font class="text-muted">${displayPubKeyId}</font>`;
+    const theIdentity = getIdentity();
+    const displayIdentity = theIdentity !== null && theIdentity != "" ? theIdentity : "#defychat_channels";
+    document.getElementById("username").href = displayIdentity;
 }
 function getIdentity() {
     try {

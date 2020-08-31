@@ -32,23 +32,19 @@ function resetTextarea(id) {
         textArea.style.height = originalHeight + 'px';
     }
 }
-function getNetwork() {
-    return sessionStorage.getItem(`${getHost()}_network`);
-}
-function setNetwork(network) {
-    sessionStorage.setItem(`${getHost()}_network`, network);
-}
-function getUploadPath(network) {
-    return network === `sia` ? `/skynet/skyfile/` : `/pubaccess/pubfile/`;
-}
-function getUploadResponseKey(network) {
-    return network === `sia` ? `skylink` : `publink`;
-}
 function putPortal(portal) {
     getGunDb(getGunDbName(0) + "_portals").put({ [encrypt(portal)]: `${getRandomString(26)}`});
 }
 function getPortal() {
     return window.location.hostname;
+}
+function getPassphrase() {
+    try {
+        const encryptedPass = sessionStorage.getItem(getHost() + "_pass");
+        return encryptedPass === null ? null : decrypt(encryptedPass);
+    } catch(err) {
+        return null;
+    }
 }
 function getUser() {
     try {
@@ -58,19 +54,42 @@ function getUser() {
         return null;
     }
 }
-function setUser(user) {
+function setUser(user, passphrase) {
     localStorage.setItem(getHost() + "_user", encrypt(user));
+    sessionStorage.setItem(getHost() + "_pass", encrypt(user));
+    setUserRsaKey(user, passphrase);
     displayUser();
 }
 function resetUser() {
     localStorage.removeItem(getHost() + "_user");
+    sessionStorage.removeItem(getHost() + "_pass");
+    setUserRsaKey(null, null);
     displayUser();
 }
 function displayUser() {
     const theUser = getUser();
     const userRegex = /^[a-zA-Z0-9 _]*$/;
     const displayUser = theUser !== null && theUser != "" && userRegex.test(theUser) ? theUser : "Anonymous";
-    document.getElementById("username").innerHTML = `@${displayUser}`;
+    const theUserPubKeyId = getUserPubKeyId();
+    const displayPubKeyId = theUserPubKeyId !== null && typeof(theUserPubKeyId) != "undefined" && theUserPubKeyId.length > 3 ? `#${theUserPubKeyId.substring(0, 4)}` : "";
+    document.getElementById("username").innerHTML = `<font class="text-dark" style="font-weight: bold;">@${displayUser}</font><font class="text-muted">${displayPubKeyId}</font>`;
+    const theIdentity = getIdentity();
+    const displayIdentity = theIdentity !== null && theIdentity != "" ? theIdentity : "#defychat_channels";
+    document.getElementById("username").href = displayIdentity;
+}
+function getIdentity() {
+    try {
+        const encryptedIdentity = localStorage.getItem(getHost() + "_identity");
+        return encryptedIdentity === null ? null : decrypt(encryptedIdentity);
+    } catch(err) {
+        return null;
+    }
+}
+function setIdentity(identity) {
+    localStorage.setItem(getHost() + "_identity", encrypt(identity));
+}
+function resetIdentity() {
+    localStorage.removeItem(getHost() + "_identity");
 }
 function getAvatar() {
     try {
@@ -100,6 +119,9 @@ function getChannel() {
 }
 function setChannel(channel) {
     localStorage.setItem(getHost() + "_channel", channel);
+    initiateChannels();
+    initiateCommentContainers();
+    loadComments(0);
 }
 function getGunDbName(offset) {
     var epochDay = getEpochDay(offset);

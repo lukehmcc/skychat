@@ -57,12 +57,18 @@
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.0.0/crypto-js.min.js" integrity="sha384-0GjPiy2OWGZr3mGFrBPHGVu/8A+YHOeDXUFWv6NDA2nO6eVq9UoFnzUSy1bVv8FE" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/gun.js" integrity="sha384-0kBpxICYZoT8h+AK/aFHPTnvg3pFQle+S3pwvmMoUPIGBuXaHTiqNUPGRvpOU1ea" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/not.js" integrity="sha384-1tPi3AL7O+RyZptCFmnrEiZ41GSY27D0p38b9R31mJ8fjOAYCjvcrrciqFgIcnNC" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gun/lib/webrtc.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gun/lib/radix.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gun/lib/radisk.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gun/lib/store.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gun/lib/rindexed.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/webrtc.js" integrity="sha384-I0RNPQ8ZddpI/CIUGzxKkntbmAXpHLLkI8XKRIcsg5iyBXJX1UtX44MvK6r1npaz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/radix.js" integrity="sha384-vk2TNjSuyajeycHuTbL3Fqz3W33I6lsyiIHedLsnQMz1nuyZ/zCSepAM3tAY6HHk" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/radisk.js" integrity="sha384-fI/T78tcNzq2WIYP36nAnsST7RLahlDqUzq5qhxEz1rGLQyz8LCUJza/rLWwxmSE" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/store.js" integrity="sha384-BApUcFs7wMwndR09Cx7TPmC+vnqIo/8LDxCbElaF/2+DNh/XGHzYOacg1L5+CP4X" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/rindexed.js" integrity="sha384-551Ach2JStIxFJchKmZJMrwIr3tJwXx4KHVPvtP1Xmka1x3HMoy8n5CiBYWfjqQl" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js" integrity="sha384-TTjj1KxpUMxMChPbgmSWLlfEep0/67X86v9lnJMkldzkQGHZNAhZRgE9owovIRyz" crossorigin="anonymous"></script>
+    <script src="https://www.defy.chat/js/cryptico/jsbn.js" integrity="sha384-qkJG76LPhUWhqnlz3d1EuN/5h04c/JTXjbDO1lTP9Fz283Bz/57HFNjkcsZZW8/D" crossorigin="anonymous"></script>
+    <script src="https://www.defy.chat/js/cryptico/random.js" integrity="sha384-CD7LG+bdrjL46yA/OGVCp1tUFWtjUy7vdXNmZyp0CqNaJsxokx3E2E3sH1ncsUDf" crossorigin="anonymous"></script>
+    <script src="https://www.defy.chat/js/cryptico/hash.js" integrity="sha384-aEevKv8ucSql/ugEZpaF+s8v3s/Ni0jKCR/RywYbeO1n3yTsnTMlJb+WtRMdXRgb" crossorigin="anonymous"></script>
+    <script src="https://www.defy.chat/js/cryptico/rsa.js" integrity="sha384-oO1CVFx1q4GujLTF9giR6nhbKrCfP05PsSYdVvdkf2k5vSOOvVHXBKL4Rl+ZGJMX" crossorigin="anonymous"></script>
+    <script src="https://www.defy.chat/js/cryptico/aes.js" integrity="sha384-c7FlnEPf7aq30LevJoFmjxupH28NGI7SVdTw9AO2ZYomnJMdWNr/OuWqzdLhvNH5" crossorigin="anonymous"></script>
+    <script src="https://www.defy.chat/js/cryptico/api.js" integrity="sha384-/aDJUkK92dEBmItmuZhgnqbjZJ1+DX4olk3aWYREpXg7JG6RVgObFudIBZDIELjY" crossorigin="anonymous"></script>
     <script>
 const scripts = [
     "js/archive_comments.js",
@@ -123,7 +129,6 @@ function initiateScripts(i) {
             initiateScripts(i + 1);
         });
     } else {
-        $.globalEval(compiledScripts);
         initiateNetwork();
         fetch(`index.html`)
             .then(response => response.text())
@@ -157,6 +162,30 @@ function initiateScripts(i) {
                     .catch(error => {console.error('Error:', error)});
             })
     }
+}
+function initiateNetwork() {
+    var formData = new FormData();
+    formData.append('file', new Blob([""],{ type: 'text/html' }));
+    fetch(`${getUploadPath("sia")}${getRandomString(26)}?dryrun=true&filename=exists.query`, {method: 'POST',body: formData})
+        .then(response => response.json())
+        .then(result => {
+            setNetwork(`sia`);
+        })
+        .catch(error => {
+            setNetwork(`prime`);
+        });
+}
+function getNetwork() {
+    return sessionStorage.getItem(`${getHost()}_network`);
+}
+function setNetwork(network) {
+    sessionStorage.setItem(`${getHost()}_network`, network);
+}
+function getUploadPath(network) {
+    return network === `sia` ? `/skynet/skyfile/` : `/pubaccess/pubfile/`;
+}
+function getUploadResponseKey(network) {
+    return network === `sia` ? `skylink` : `publink`;
 }
 function getHost() {
     return document.getElementById("defychat_host").innerHTML;
@@ -327,6 +356,18 @@ function getRandomString(len) {
                 <span class="input-group-text">User Name</span>
               </div>
               <input id="user" type="text" class="form-control">
+            </div>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Passphrase</span>
+              </div>
+              <input id="pass" type="password" class="form-control">
+            </div>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Identity URL</span>
+              </div>
+              <input id="identity" type="text" class="form-control">
             </div>
             <div class="input-group mb-3">
               <div class="input-group-prepend">

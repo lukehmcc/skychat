@@ -1,8 +1,6 @@
 function login() {
     document.getElementById('login-trigger-container').style.display = `none`;
     document.getElementById('login-loading-container').style.display = `block`;
-    setUser(document.getElementById("user").value);
-    setAvatar("");
     var file = document.getElementById('contact').files[0];
     if (file != null) {
         $.ajax({
@@ -15,14 +13,23 @@ function login() {
             processData: false,
             dataType: 'json',
             success: function (data, textStatus, jqXHR) {
-                setAvatar(data[getUploadResponseKey(getNetwork())]);
+                finializeLogin(data[getUploadResponseKey(getNetwork())]);
                 $("#resultsModal").modal("hide");
             },
             error: function (jqXHR, textStatus, errorThrown) {
+                finializeLogin("");
                 $("#resultsModal").modal("hide");
             }
         });
     } else {
+        finializeLogin("");
         $("#resultsModal").modal("hide");
     }
+}
+function finializeLogin(avatar) {
+    const theUser = document.getElementById("user").value;
+    const thePass = document.getElementById("pass").value;
+    setUser(theUser, thePass);
+    setIdentity(document.getElementById("identity").value);
+    setAvatar(avatar);
 }

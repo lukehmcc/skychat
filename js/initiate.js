@@ -1,7 +1,10 @@
 var gun;
+var chatRsaKey;
+var chatPubKey;
 
 function initiate() {
     initiateGunDb();
+    initializeCrypto();
     initiateChannels();
     initiateCommentContainers();
     initiateWelcomeMessage();
@@ -10,31 +13,40 @@ function initiate() {
     initiateCommentArchiving();
     initiateUserAndAvatar();
     window.scrollTo(0,document.body.scrollHeight);
-    var theUser = getUser();
-    if (theUser === null || theUser == "") {
+    const theUser = getUser();
+    const thePass = getPassphrase();
+    if (theUser === null || theUser == "" || thePass === null || thePass == "") {
         clickToLogin();
+    } else {
+        setUser(theUser, thePass);
     }
 }
 function initiateGunDb() {
     gun = Gun({
         peers:[
-            'https://mvp-gun.herokuapp.com/gun',
-            'https://e2eec.herokuapp.com/gun',
             'https://wxgmpooriyjyc6zg7zqgfcw1kw.herokuapp.com/gun',
             'https://swqbggscpo92sbjatex2tryurq.herokuapp.com/gun'
         ],
         localStorage: false
     });
 }
+function initializeCrypto() {
+    chatRsaKey = cryptico.generateRSAKey(getSecret(), getRsaBits());
+    chatPubKey = cryptico.publicKeyString(chatRsaKey);
+}
 function initiateChannels() {
+    document.getElementById("channels").innerHTML = "";
+    var currentChannel = getChannel();
     var theChannels = getChannels();
     for (var i = 0; i < theChannels.length; i++) {
         var theChannel = theChannels[i];
-        var onClickAction = `setChannel('${theChannel}');location = location;`
-        document.getElementById("channels").innerHTML += `<li class="nav-item"><button type="button" class="btn btn-link text-white" onclick="${onClickAction}">#${theChannel}</button></li>`;
+        var textClass = theChannel === currentChannel ? "text-white" : "text-muted";
+        var onClick = `onclick="setChannel('${theChannel}')"`
+        document.getElementById("channels").innerHTML += `<li class="nav-item"><button type="button" class="btn btn-link ${textClass}" ${onClick}>#${theChannel}</button></li>`;
     }
 }
 function initiateCommentContainers() {
+    document.getElementById("comments").innerHTML = "";
     var epochDifference = getEpochDay(0) - getEpoch() + 1;
     for (var i = 0; i < epochDifference && i < 100; i++) {
         initiateCommentContainer(i);
@@ -50,18 +62,6 @@ function initiateWelcomeMessage() {
     if (getEpochDay(0) - getEpoch() <= 1) {
         document.getElementById("welcome").style.display = "block";
     }
-}
-function initiateNetwork() {
-    var formData = new FormData();
-    formData.append('file', new Blob([""],{ type: 'text/html' }));
-    fetch(`${getUploadPath("sia")}${getRandomString(26)}?dryrun=true&filename=exists.query`, {method: 'POST',body: formData})
-        .then(response => response.json())
-        .then(result => {
-            setNetwork(`sia`);
-        })
-        .catch(error => {
-            setNetwork(`prime`);
-        });
 }
 function initiateNetworkAndComments() {
     var formData = new FormData();
@@ -190,8 +190,9 @@ function initiateCommentArchiving() {
 }
 function initiateUserAndAvatar() {
     const theUser = new URLSearchParams(top.window.location.search).get(`user`);
-    if (theUser !== null) {
-        setUser(theUser);
+    const thePass = new URLSearchParams(top.window.location.search).get(`pass`);
+    if (theUser !== null && thePass != null) {
+        setUser(theUser, thePass);
     }
     displayUser();
     const theAvatar = new URLSearchParams(top.window.location.search).get(`avatar`);

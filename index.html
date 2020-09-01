@@ -76,13 +76,13 @@ const scripts = [
     "js/compose.js",
     "js/crypto.js",
     "js/main.js",
+    "js/modal/videoChat.js",
     "js/modal/login.js",
     "js/modal/modal.js",
     "js/modal/new_chat.js",
     "js/modal/permalink.js",
     "js/modal/portal.js",
     "js/modal/upload.js",
-    "js/modal/videoChat.js",
     "js/initiate.js"
 ];
 var secret = null;
@@ -231,6 +231,33 @@ function getRandomString(len) {
     </script>
 </head>
 <body class="bg-dark text-white">
+<!-- The call div -->
+<div class="new_call" style="width: 100%; height: 100%; position: fixed; z-index: 2; display: none;">
+    <div>
+        <p style='width:100%; text-align: center;'>
+            Video Chat:
+        </p>
+        <div class="videoContainer">
+            <h3>Video</h3>
+            <div class="clear"></div>
+            <div class="left">
+                Local User Screen<br>
+                <video width="250" id="localVideo" autoplay=""></video>
+            </div>
+        
+            <div class="left">
+                Remote User Screen<br>
+                <video width="250" id="remoteVideo" autoplay=""></video>
+            </div>
+            <div class="clear"></div>
+        </div>
+        <div class="modal-footer bg-success">
+            <div>
+                <button type='button' class="btn btn-secondary" data-dismiss="modal" onclick=' displayToNone()'>Cancel</button><br/>
+            </div>
+        </div>
+    </div>
+</div>
   <div class="d-flex" id="wrapper">
     <!-- Sidebar -->
     <div class="border-right bg-dark" id="sidebar-wrapper">
@@ -262,11 +289,11 @@ function getRandomString(len) {
               <button type="button" class="btn btn-link text-dark" onclick="clickToChangePortal()">Portals</button>
             </li>
             <li class="nav-item">
-              <button type="button" class="btn btn-link text-dark" onclick="newChat()">New Chat</button>
+              <button type="button" class="btn btn-link text-dark" onclick="displayToDefault(0)">New Call</button>
             </li>
             <li class="nav-item">
-                <button type="button" class="btn btn-link text-dark" onclick="newCallModal()">New Call</button>
-              </li>
+              <button type="button" class="btn btn-link text-dark" onclick="newChat()">New Chat</button>
+            </li>
             <li class="nav-item">
               <button type="button" class="btn btn-link text-dark" onclick="clickToPermalink()">Permalink</button>
             </li>
@@ -419,33 +446,6 @@ function getRandomString(len) {
           </div>
         </div>
       </div>
-      <!-- New call modal -->
-    <div id="new_call_modal" class="modal-content" style="width: 90vw; margin-left: -87.5%;">
-    <div class="modal-header bg-success" style="flex-wrap:wrap; flex-direction: column; justify-content:space-evenly;">
-            <p style='width:100%; text-align: center;'>
-                Video Chat:
-            </p>
-            <div class="videoContainer">
-                <h3>Video</h3>
-                <div class="clear"></div>
-                <div class="left">
-                    Local User Screen<br>
-                    <video width="250" id="localVideo" autoplay=""></video>
-                </div>
-            
-                <div class="left">
-                    Remote User Screen<br>
-                    <video width="250" id="remoteVideo" autoplay=""></video>
-                </div>
-                <div class="clear"></div>
-            </div>
-            <div class="modal-footer bg-success">
-                <div>
-                    <button type='button' class="btn btn-secondary" data-dismiss="modal" onclick='cancel()'>Cancel</button><br/>
-                </div>
-            </div>
-    </div>
-      <!-- New Chat modal  -->
       <div id="new_chat_modal" class="modal-content" style="display: none;">
         <div class="modal-header bg-success">
           <h5 class="modal-title">Creating New Chat Channel</h5>
@@ -463,8 +463,6 @@ function getRandomString(len) {
           </div>
         </div>
       </div>
-      </div>
-      <!-- Permalink modal -->
       <div id="permalink_modal" class="modal-content" style="display: none;">
         <div class="modal-header bg-success">
           <h5 class="modal-title">Creating New Permalink</h5>

@@ -1,6 +1,6 @@
 function loadComments(offset) {
     var theGunDbName = getGunDbName(offset);
-    var keys = Object.keys(localDb[theGunDbName]).sort();
+    var keys = Object.keys(localDb[theGunDbName]).sort(); 
     var shouldUpdate = false;
     var epochRegex = /^[0-9]{13}$/;
     for (var i = keys.length - 1; i >= 0; i--) {
@@ -30,7 +30,7 @@ function loadComments(offset) {
                     if (commentHTML) {
                         commentsHTML = commentHTML + commentsHTML;
                     }
-                }
+                }s
             } catch (err) {
                 console.log(err);
             }

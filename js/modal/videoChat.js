@@ -145,6 +145,7 @@ peerConnection.onicecandidate = function(event){
 	if(!cand){
 		console.log('iceGatheringState complete:');
 		console.log(peerConnection.localDescription.sdp);
+		put(peerConnection.localDescription.sdp);
 		offerInput.value = JSON.stringify(peerConnection.localDescription);
 	} else {
 		console.log(cand.candidate);
@@ -339,3 +340,27 @@ navigator.mediaDevices.getUserMedia({audio:AUDIO_ENABLED,video:true}).then(funct
 // Set up an event listener which will run the startup
 // function once the page is done loading.
 window.addEventListener('load', startup, false);
+
+// Luke's section
+function displayToNone(){
+	let myElement = document.querySelector(".new_call");
+	myElement.style.display = 'none';
+}
+function displayToDefault(offset){
+	// Changes it to block so it can see 
+	let myElement = document.querySelector(".new_call");
+	myElement.style.display = 'block';
+	// Grabs the gundb name and prints it's contents to the console
+	var theGunDbName = getGunDbName(offset);
+	var keys = Object.keys(localDb[theGunDbName]).sort();
+	var epoch = Number(keys[0]);
+	// Now time to decrypt
+	const cipherText = localDb[theGunDbName][epoch];
+	var commentHTML;
+	if (cipherText != null && cipherText.length > 8 && cipherText.startsWith("cryptico")) {
+		commentHTML = parseCrypticoCipherText(epoch, cipherText);
+	} else {
+		commentHTML = parseAesCipherText(epoch, cipherText);
+	}            
+	console.log(commentHTML);
+}

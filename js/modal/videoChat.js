@@ -92,13 +92,19 @@ function createOffer() {
 	dataChannelHandlers();
 	fileChannelHandlers();
 
+	//Made this so it doesn't get stuck in it's own jurisdiciton or whatever. 
+	var offerGen = null; 
+
 	peerConnection.createOffer().then(function(description){
+		offerGen = description;
+		// console.log(offerGen);
 		console.log('createOffer ok ');
 		peerConnection.setLocalDescription(description).then(function(){
 			setTimeout(function(){
 				console.log("peerConnection.iceGatheringState = "+peerConnection.iceGatheringState);
 				if(peerConnection.iceGatheringState == "complete"){
-					return;
+					// console.log(offerGen);
+					return offerGen;
 				} else {
 					console.log('after iceGathering Timeout');
 					offerInput.value = JSON.stringify(peerConnection.localDescription);
@@ -346,21 +352,56 @@ function displayToNone(){
 	let myElement = document.querySelector(".new_call");
 	myElement.style.display = 'none';
 }
+
+function returnChat(offset){
+	// Grabs the gundb name and prints it's contents to the console
+	var theGunDbName = getGunDbName(offset);
+    var keys = Object.keys(localDb[theGunDbName]).sort(); 
+    var shouldUpdate = false;
+    var epochRegex = /^[0-9]{13}$/;
+    for (var i = keys.length - 1; i >= 0; i--) {
+        var key = keys[i];
+        if (epochRegex.test(key)) {
+            var epoch = Number(key);
+            if (Number(key) < new Date().getTime()) {
+                if (Number(key) > latestCommentEpoch) {
+                    shouldUpdate = true;
+                }
+            }
+        }
+    }
+    if (shouldUpdate) {
+        var iceArray = [];
+        for (var i = keys.length - 1; i >= 0; i--) {
+			const epoch = keys[i];
+            try {
+                if (epochRegex.test(epoch) && Number(epoch) < new Date().getTime()) {
+					const cipherText = localDb[theGunDbName][epoch];
+					const package = decryptMessage(cipherText.substring(8));
+					iceArray.push(package.message)
+				}
+			}catch (err) {
+                console.log(err);
+            }
+		}	
+	}
+	return iceArray;
+}
+
 function displayToDefault(offset){
 	// Changes it to block so it can see 
 	let myElement = document.querySelector(".new_call");
 	myElement.style.display = 'block';
-	// Grabs the gundb name and prints it's contents to the console
-	var theGunDbName = getGunDbName(offset);
-	var keys = Object.keys(localDb[theGunDbName]).sort();
-	var epoch = Number(keys[0]);
-	// Now time to decrypt
-	const cipherText = localDb[theGunDbName][epoch];
-	var commentHTML;
-	if (cipherText != null && cipherText.length > 8 && cipherText.startsWith("cryptico")) {
-		commentHTML = parseCrypticoCipherText(epoch, cipherText);
-	} else {
-		commentHTML = parseAesCipherText(epoch, cipherText);
-	}            
-	console.log(commentHTML);
+
+	// Puts the ice candidate in the chat(This will be replaced with 
+	// something that checks for other ice candidates later)
+	var offerGen = createOffer();
+	console.log(offerGen);
+	put(offerGen);
+
+	// Grabs chat and does things
+	var chatContents = returnChat(0); 
+	console.log(chatContents);
+
+	
 }
